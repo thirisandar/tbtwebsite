@@ -117,7 +117,7 @@ const PopupModal = ({ onClose, data }) => {
         <div className="p-6 border-t text-right bg-gray-50">
             <button 
                 onClick={onClose}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150"
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 cursor-pointer"
             >
                 Close
             </button>

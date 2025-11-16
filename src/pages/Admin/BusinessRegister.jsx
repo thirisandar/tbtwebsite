@@ -1520,10 +1520,10 @@ function BusinessRegister({ setCurrentView, views }) {
             <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
                 
                 <div className="bg-yellow-600 text-white p-6 flex justify-between items-center">
-                    <h2 className="text-3xl font-extrabold">Business Registration</h2>
+                    <h2 className="text-xl font-extrabold">Business Registration</h2>
                     <button
                         onClick={() => setCurrentView(views.HOME)}
-                        className="text-md px-3 py-1 border border-white/50 rounded-full cursor-pointer hover:bg-white hover:text-blue-600 transition duration-200"
+                        className="text-md px-3 py-1 border border-black/50 text-white-500 rounded-full cursor-pointer hover:bg-black hover:text-white-600 transition duration-200"
                     >
                         ← Back to Home
                     </button>
@@ -1552,9 +1552,9 @@ function BusinessRegister({ setCurrentView, views }) {
                     <div className="pt-6 border-t mt-6">
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-4 px-4 border border-transparent cursor-pointer rounded-lg shadow-lg text-xl font-extrabold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-green-500/50 transition duration-200 transform hover:scale-[1.01]"
+                            className="w-full sm:w-1/2 mx-auto p-3 flex justify-center  border border-transparent cursor-pointer rounded-lg shadow-lg text-xl font-extrabold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-green-500/50 transition duration-200 transform hover:scale-[1.01]"
                         >
-                            Submit & Complete Registration
+                            Submit  Registration
                         </button>
                     </div>
                 </form>

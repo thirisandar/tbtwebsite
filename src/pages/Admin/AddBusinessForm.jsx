@@ -130,11 +130,11 @@ function AddBusinessForm({ onAddBusiness, onCancel, industryOptions }) {
                 {/* Action Buttons */}
                 <div className="flex justify-between pt-4 border-t border-gray-700">
                     <button type="button" onClick={onCancel}
-                        className="px-4 py-2 text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700 transition">
+                        className="px-4 py-2 text-gray-300 border border-gray-600 rounded-lg hover:bg-gray-700 transition cursor-pointer">
                         Cancel
                     </button>
                     <button type="submit" disabled={formData['Business Name'] === '' || submitLoading}
-                        className={`px-6 py-2 font-medium rounded-lg transition shadow-md ${submitLoading ? 'bg-blue-600 opacity-60' : 'bg-green-600 hover:bg-green-700 text-white'}`}>
+                        className={`px-6 py-2 font-medium rounded-lg transition shadow-md ${submitLoading ? 'bg-blue-600 opacity-60' : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'}`}>
                         {submitLoading ? 'Adding...' : 'Add Business'}
                     </button>
                 </div>

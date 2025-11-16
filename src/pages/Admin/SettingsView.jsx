@@ -60,7 +60,7 @@ function SettingsView({
                     <button 
                         type="submit" 
                         disabled={addLoading || newIndustry.trim() === ''}
-                        className={`px-6 py-2 font-medium rounded-lg transition shadow-md ${addLoading ? 'bg-blue-600 opacity-60' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                        className={`px-6 py-2 font-medium rounded-lg transition shadow-md ${addLoading ? 'bg-blue-600 opacity-60' : 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'}`}
                     >
                         {addLoading ? 'Adding...' : 'Add'}
                     </button>
@@ -87,7 +87,7 @@ function SettingsView({
                                 <button 
                                     type="button" 
                                     onClick={() => handleDeleteClick(industry)}
-                                    className="text-white hover:text-red-300 transition-colors duration-150 p-1 rounded-full bg-blue-700 hover:bg-red-700"
+                                    className="text-white hover:text-red-300 transition-colors duration-150 p-1 rounded-full bg-blue-700 hover:bg-red-700 cursor-pointer"
                                     aria-label={`Remove ${industry}`}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
