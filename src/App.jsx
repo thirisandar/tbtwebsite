@@ -303,6 +303,7 @@ const LOCAL_STORAGE_KEY = 'tbt_business_directory';
 const VIEW_STORAGE_KEY = 'tbt_current_view';
 const ADMIN_NAME_KEY = 'tbt_admin_name';
 const INDUSTRY_KEY = 'tbt_industry_options';
+const MEMBER_DATA_KEY = 'tbt_member_data';
 
 // ⭐️ NEW CONSTANT: Key for Session Storage to hold temporary scanned member data ⭐️
 const SCANNED_MEMBER_KEY = 'tbt_scanned_member'; 
@@ -525,7 +526,7 @@ function App() {
                 setCurrentView={setCurrentView}
                 views={VIEWS}
                 memberUser={memberUser}
-                onLogout={() => { setMemberUser(null); setCurrentView(VIEWS.HOME); }}
+                onLogout={() => { setMemberUser(null); setCurrentView(VIEWS.HOME); localStorage.removeItem(MEMBER_DATA_KEY); }}
             />
         );
         break;

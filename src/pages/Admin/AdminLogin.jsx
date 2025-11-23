@@ -58,11 +58,13 @@ function AdminLogin({ setCurrentView, views, onLoginSuccess }) {
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-200">
         
         {/* Header */}
-        <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-1">
+        <img src="/tbtlogo.jpg" className="w-20 rounded-full text-center mx-auto" />
+
+        <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-1">
           Log in to get access
         </h2>
         <p className="text-center text-gray-500 mb-8">
-          Sign in to the TBT Business Management Dashboard
+          Sign in to access TBT Business Management Dashboard
         </p>
         
         {/* Login Form */}
@@ -81,7 +83,7 @@ function AdminLogin({ setCurrentView, views, onLoginSuccess }) {
               onChange={(e) => setEmail(e.target.value)}
               // Disable inputs while loading
               disabled={isLoading}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-black disabled:bg-gray-50 disabled:text-gray-500"
               placeholder="e.g., admin1@tbt.com"
             />
           </div>
@@ -99,7 +101,7 @@ function AdminLogin({ setCurrentView, views, onLoginSuccess }) {
               onChange={(e) => setPassword(e.target.value)}
               // Disable inputs while loading
               disabled={isLoading}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-black disabled:bg-gray-50 disabled:text-gray-500"
               placeholder="Enter your secret password"
             />
           </div>
@@ -138,9 +140,9 @@ function AdminLogin({ setCurrentView, views, onLoginSuccess }) {
         <div className="mt-6 text-center">
           <button 
             onClick={() => setCurrentView(views.HOME)}
-            className="text-md font-medium text-gray-700 cursor-pointer hover:text-blue-600 transition duration-150"
+            className="text-md text-gray-900 font-bold cursor-pointer hover:text-blue-400 transition duration-150"
           >
-            ← Back to TBT Website
+            ← Back to Website
           </button>
         </div>
       </div>

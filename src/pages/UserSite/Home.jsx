@@ -1,8 +1,18 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import PopUpModal from '../../components/PopUpModal.jsx'; 
 import { db } from '../../firebase'; 
 import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
+
+// ⭐️ NEW COMPONENT: Loading Spinner (Reusable) ⭐️
+const LoadingSpinner = () => (
+    <div className="flex flex-col items-center justify-center py-12 col-span-full">
+        <svg className="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p className="mt-3 text-lg text-gray-500">Loading Businesses...</p>
+    </div>
+);
 
 // --- Card Component ---
 const CardBox = ({ business, onModalOpen }) => (
@@ -20,7 +30,7 @@ const CardBox = ({ business, onModalOpen }) => (
         <button 
             onClick={() => onModalOpen(business)} 
             // Button: Strong Blue for contrast
-            className="w-full mt-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition duration-150 shadow-md cursor-pointer"
+            className="w-full mt-4 py-2 bg-blue-300 text-gray-600 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition duration-150 shadow-md cursor-pointer"
         >
             View Details
         </button>
@@ -83,8 +93,8 @@ function Home({ setCurrentView, views }) {
                 
                 {/* Title/Text (Centered) */}
                 <div className="flex flex-col items-center">
-                    <h1 className="text-3xl font-extrabold text-blue-800 tracking-tight">TBT Website</h1>
-                    <p className="text-lg text-gray-600 mt-1 font-light">Business Matching Portal</p>
+                    <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">TBT Website </h1>
+                    <p className="text-md text-gray-800 mt-1 font-light">This is TBT Business Matching Portal Website</p>
                 </div>
 
                 {/* Logo (Top Right - absolute positioning) */}
@@ -101,7 +111,7 @@ function Home({ setCurrentView, views }) {
                  {/* MEMBER LOGIN (Light Blue Accent, rounded full) */}
                  <button
                     onClick={() => setCurrentView(views.MEMBER_AUTH)} 
-                    className="px-6 py-2 cursor-pointer bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600 transition duration-150 shadow-md text-base"
+                    className="px-6 py-2 cursor-pointer bg-blue-300 text-gray-700 font-medium rounded-full hover:bg-blue-600 hover:text-white transition duration-150 shadow-md text-base"
                 >
                     Member Login
                 </button>
@@ -109,7 +119,7 @@ function Home({ setCurrentView, views }) {
                 {/* ADMIN LOGIN (Darker Blue, rounded full) */}
                  <button 
                     onClick={() => setCurrentView(views.ADMIN_LOGIN)}
-                    className="px-6 py-2 cursor-pointer bg-blue-700 text-white font-medium rounded-full hover:bg-blue-800 transition duration-150 shadow-md text-base"
+                    className="px-6 py-2 cursor-pointer bg-blue-400 text-gray-800 font-medium rounded-full hover:bg-blue-800 hover:text-white transition duration-150 shadow-md text-base"
                  >
                     Admin Login
                  </button>
@@ -120,7 +130,8 @@ function Home({ setCurrentView, views }) {
       {/* 2. MAIN CONTENT (Search, Filter, Grid) */}
       <main className="container mx-auto p-4 pt-8">
         <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Search Businesses (<span className="text-blue-600">{businesses.length}</span> Active)</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Please Search Businesses</h2>
+            <span className="text-blue-600">{businesses.length} Active Business</span> 
             <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch">
                 <input 
                     type="text" 
@@ -128,14 +139,14 @@ function Home({ setCurrentView, views }) {
                     value={searchTerm} 
                     onChange={(e) => setSearchTerm(e.target.value)} 
                     // Search Input: Clean border focus
-                    className="w-full flex-grow p-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                    className="w-full flex-grow p-3 border border-gray-300 rounded-lg focus:border-gray-500  focus:outline-none" 
                 />
                 <div className="relative w-full md:w-1/4">
                     <select 
                         value={activeFilter} 
                         onChange={(e) => setActiveFilter(e.target.value)} 
                         // Select Input: Clean border
-                        className="appearance-none w-full p-3 border border-gray-300 rounded-lg bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="appearance-none w-full p-3 border border-gray-300 rounded-lg bg-white focus:border-blue-300 focus:outline-none"
                     >
                         {DYNAMIC_FILTER_CATEGORIES.map(type => <option key={type} value={type}>{type === 'All' ? 'Filter by Type' : type}</option>)}
                     </select>
@@ -152,7 +163,7 @@ function Home({ setCurrentView, views }) {
                     className={`py-2 px-4 rounded-full font-medium text-sm whitespace-nowrap transition duration-150 
                         ${activeFilter === category 
                             ? 'bg-blue-600 text-white shadow-md' 
-                            : 'text-gray-700 bg-white border border-gray-200 hover:bg-blue-50 hover:text-blue-700'
+                            : 'text-gray-700 bg-white border border-gray-200 hover:bg-blue-50 hover:text-gray-700'
                         }`}
                 >
                     {category === 'All' ? 'All Types' : category}
@@ -163,7 +174,8 @@ function Home({ setCurrentView, views }) {
         {/* Business Grid */}
         <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {isLoading ? (
-                <p className="col-span-full text-center text-gray-500">Loading Businesses...</p>
+                // ⭐️ MODIFIED: Using the new spinner component ⭐️
+                <LoadingSpinner />
             ) : filteredBusinesses.length > 0 ? (
                 filteredBusinesses.map(b => <CardBox key={b.id} business={b} onModalOpen={handleModalOpen} />)
             ) : <p className="col-span-full text-center text-gray-500">No active businesses found matching your criteria.</p>}
