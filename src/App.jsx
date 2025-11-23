@@ -1,13 +1,19 @@
 // import React, { useState, useEffect } from 'react';
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // import Home from "./pages/UserSite/Home.jsx";
+
 // import AdminLogin from "./pages/Admin/AdminLogin.jsx";
 // import BusinessRegister from "./pages/Admin/BusinessRegister.jsx";
 // import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
+// import MemberAuth from "./pages/UserSite/MemberAuth.jsx"; // ⭐️ NEW IMPORT
+// import MemberDashboard from "./pages/UserSite/MemberDashboard.jsx"; // ⭐️ NEW IMPORT
 // import { INITIAL_BUSINESS_DATA } from './data/adminDashboardData'; 
-// // NOTE: Ensure './data/adminDashboardData' exists and exports INITIAL_BUSINESS_DATA
+// import ScanPage from "./pages/UserSite/ScanPage.jsx";
 
 // const VIEWS = {
 //   HOME:'home',
+//   MEMBER_AUTH: 'memberAuth', // ⭐️ NEW VIEW CONSTANT
+//   MEMBER_DASHBOARD: 'memberDashboard', // ⭐️ NEW VIEW CONSTANT
 //   ADMIN_LOGIN:'adminLogin',
 //   BUSINESS_REGISTER:'businessRegister',
 //   ADMIN_DASHBOARD:'adminDashboard'
@@ -39,6 +45,9 @@
 //     const savedName = localStorage.getItem(ADMIN_NAME_KEY);
 //     return savedName || 'Admin User';
 //   });
+  
+//   // ⭐️ NEW STATE: Store logged-in member info
+//   const [memberUser, setMemberUser] = useState(null);
 
 //   // 1. Initialize businessData from localStorage or fall back to mock data
 //   const [businessData, setBusinessData] = useState(() => {
@@ -90,6 +99,8 @@
 //         localStorage.removeItem(ADMIN_NAME_KEY);
 //         localStorage.removeItem(VIEW_STORAGE_KEY);
 //         setAdminName('Admin User'); 
+//         // Optional: Clear member user on Home if you want strict logout
+//         // setMemberUser(null); 
 //     }
 //   }, [adminName, currentView]);
 
@@ -102,30 +113,36 @@
 //     setCurrentView(VIEWS.ADMIN_DASHBOARD); 
 //   };
 
+//   // ⭐️ NEW HANDLER: Member Login Success
+//   const handleMemberLoginSuccess = (memberData) => {
+//       console.log("Member Logged In:", memberData);
+//       setMemberUser(memberData);
+      
+//       // After login, we redirect them to the Business Register page 
+//       // (Assuming this is the goal: Members register businesses)
+//       setCurrentView(VIEWS.MEMBER_DASHBOARD); // ⭐️ REDIRECT TO DASHBOARD
+//   };
+
 //   // Handler for adding a new Industry Type (used in AdminDashboard Settings)
 //   const onAddIndustry = (newIndustry) => {
 //       setCurrentIndustryOptions(prevOptions => {
-//           // Add the new industry and sort alphabetically
 //           return [...prevOptions, newIndustry].sort();
 //       });
 //   };
 
-//   // Handler to delete a business (used in AdminDashboard)
+//   // Handler to delete a business
 //   const deleteBusiness = (businessId) => {
 //     setBusinessData(prevData => {
 //         return prevData.filter(business => business.id !== businessId);
 //     });
 //   };
 
-//   // Handler to update ANY field(s) of a business (used in AdminDashboard Edit View)
+//   // Handler to update ANY field(s) of a business
 //   const updateBusinessData = (businessId, updatedFields) => {
 //     setBusinessData(prevData => {
 //       return prevData.map(business => {
 //         if (business.id === businessId) {
-//           return {
-//             ...business,
-//             ...updatedFields
-//           };
+//           return { ...business, ...updatedFields };
 //         }
 //         return business;
 //       });
@@ -135,11 +152,10 @@
 
 //   // --- BUSINESS REGISTRATION HANDLERS ---
   
-//   // 1. Used by BusinessRegister.jsx (User-submitted form, requires field name mapping)
+//   // 1. Used by BusinessRegister.jsx (User/Member submitted)
 //   const registerBusinessFromUser = (newBusinessFormData) => {
 //     const newId = Date.now();
     
-//     // Map the form data keys (camelCase) to the required dashboard keys (Title Case)
 //     const newBusiness = {
 //         id: newId,
 //         'Business Name': newBusinessFormData.businessName,
@@ -154,29 +170,26 @@
 //         'Tiktok Link': newBusinessFormData.tiktokLink,
 //         'Google Map Link': newBusinessFormData.googleMapLink,
 //         'Logo URL': newBusinessFormData.logo,
-//         Status: 'Pending Review', // Default status for user submissions
+//         Status: 'Pending Review', 
+//         // Optional: Link business to the logged-in member if available
+//         MemberPhone: memberUser ? memberUser.phoneNumber : null 
 //     };
     
 //     setBusinessData(prevData => [...prevData, newBusiness]);
-//     setCurrentView(VIEWS.HOME); // Navigate back to the Home page after successful registration
+//     setCurrentView(VIEWS.HOME); 
 //   };
   
-//   // 2. ⭐️ MISSING FUNCTION (The fix for the ReferenceError) 
-//   // Used by AdminDashboard.jsx (Admin-submitted form, data is already in Title Case)
+//   // 2. Used by AdminDashboard.jsx
 //   const handleRegisterBusiness = (newBusinessFormData) => {
 //     const newId = Date.now();
     
-//     // The Admin form already uses the correct Title Case keys, so we just add the ID
 //     const newBusiness = {
 //         id: newId,
-//         // Spread the entire form data passed from AdminDashboard
 //         ...newBusinessFormData, 
-//         // Ensure Status defaults to 'Active' if not provided by the form
 //         Status: newBusinessFormData.Status || 'Active' 
 //     };
     
 //     setBusinessData(prevData => [...prevData, newBusiness]);
-//     // Note: AdminDashboard handles navigation/messages internally
 //   };
 
 
@@ -186,16 +199,48 @@
 
 //   switch(currentView){
 //     case VIEWS.HOME:
-//       // Pass the businessData as 'allBusinesses' for clarity in Home.jsx
 //       ContentComponent =  <Home setCurrentView={setCurrentView} views={VIEWS} allBusinesses={businessData} />;
 //       break; 
+      
+//     case VIEWS.MEMBER_AUTH: // ⭐️ NEW VIEW CASE
+//       ContentComponent = (
+//         <MemberAuth 
+//             setCurrentView={setCurrentView} 
+//             views={VIEWS} 
+//             onMemberLoginSuccess={handleMemberLoginSuccess} 
+//         />
+//       );
+//       break;
+      
+//       case VIEWS.MEMBER_DASHBOARD:
+//         // Pass member data and navigation functions
+//         ContentComponent = (
+//             <MemberDashboard
+//                 setCurrentView={setCurrentView}
+//                 views={VIEWS}
+//                 memberUser={memberUser}
+//                 onLogout={() => { setMemberUser(null); setCurrentView(VIEWS.HOME); }}
+//             />
+//         );
+//         break;
+
 //     case VIEWS.ADMIN_LOGIN:
 //       ContentComponent = <AdminLogin views={VIEWS} onLoginSuccess={handleAdminLogin} setCurrentView={setCurrentView} />;      
 //       break; 
+      
 //     case VIEWS.BUSINESS_REGISTER:
-//       // Pass the user registration function
-//       ContentComponent = <BusinessRegister setCurrentView={setCurrentView} views={VIEWS} addBusiness={registerBusinessFromUser} industryOptions={currentIndustryOptions} />;
+//       ContentComponent = (
+//         <BusinessRegister 
+//             setCurrentView={setCurrentView} 
+//             views={VIEWS} 
+//             addBusiness={registerBusinessFromUser} 
+//             industryOptions={currentIndustryOptions} 
+//             // Optional: Pass member data to pre-fill form
+//             currentUser={memberUser} 
+//         />
+//       );
 //       break; 
+      
 //     case VIEWS.ADMIN_DASHBOARD:
 //       ContentComponent  = <AdminDashboard 
 //                                 setCurrentView={setCurrentView} 
@@ -204,19 +249,30 @@
 //                                 adminName={adminName} 
 //                                 onUpdateData={updateBusinessData} 
 //                                 onDeleteBusiness={deleteBusiness}
-//                                 currentIndustryOptions={currentIndustryOptions} // <-- PASSED
-//                                 onAddIndustry={onAddIndustry}                     // <-- PASSED
-//                                 onRegisterBusiness={handleRegisterBusiness}       // ⭐️ PASSED (FIXED ERROR)
+//                                 currentIndustryOptions={currentIndustryOptions} 
+//                                 onAddIndustry={onAddIndustry}                     
+//                                 onRegisterBusiness={handleRegisterBusiness}       
 //                             />;
 //       break; 
+      
 //     default:
 //       ContentComponent = <Home setCurrentView={setCurrentView} views={VIEWS} allBusinesses={businessData} />;
 //   }
   
 //   return (
-//        <div className="app-container">
-//           {ContentComponent}
-//        </div>
+//     <Router> 
+//         <Routes>
+//             {/* 1. Dedicated Route for QR Code Scanning */}
+//             <Route path="/scan" element={<ScanPage />} /> 
+
+//             {/* 2. Main Application Content (Your State-Based Router) */}
+//             <Route path="*" element={
+//                 <div className="app-container">
+//                     {ContentComponent}
+//                 </div>
+//             } />
+//         </Routes>
+//    </Router>
 //   )
 // }
 
@@ -228,15 +284,15 @@ import Home from "./pages/UserSite/Home.jsx";
 import AdminLogin from "./pages/Admin/AdminLogin.jsx";
 import BusinessRegister from "./pages/Admin/BusinessRegister.jsx";
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
-import MemberAuth from "./pages/UserSite/MemberAuth.jsx"; // ⭐️ NEW IMPORT
-import MemberDashboard from "./pages/UserSite/MemberDashboard.jsx"; // ⭐️ NEW IMPORT
+import MemberAuth from "./pages/UserSite/MemberAuth.jsx"; 
+import MemberDashboard from "./pages/UserSite/MemberDashboard.jsx"; 
 import { INITIAL_BUSINESS_DATA } from './data/adminDashboardData'; 
 import ScanPage from "./pages/UserSite/ScanPage.jsx";
 
 const VIEWS = {
   HOME:'home',
-  MEMBER_AUTH: 'memberAuth', // ⭐️ NEW VIEW CONSTANT
-  MEMBER_DASHBOARD: 'memberDashboard', // ⭐️ NEW VIEW CONSTANT
+  MEMBER_AUTH: 'memberAuth',
+  MEMBER_DASHBOARD: 'memberDashboard',
   ADMIN_LOGIN:'adminLogin',
   BUSINESS_REGISTER:'businessRegister',
   ADMIN_DASHBOARD:'adminDashboard'
@@ -247,6 +303,9 @@ const LOCAL_STORAGE_KEY = 'tbt_business_directory';
 const VIEW_STORAGE_KEY = 'tbt_current_view';
 const ADMIN_NAME_KEY = 'tbt_admin_name';
 const INDUSTRY_KEY = 'tbt_industry_options';
+
+// ⭐️ NEW CONSTANT: Key for Session Storage to hold temporary scanned member data ⭐️
+const SCANNED_MEMBER_KEY = 'tbt_scanned_member'; 
 
 // Base industry list for the app
 const BASE_INDUSTRY_OPTIONS = [
@@ -328,6 +387,31 @@ function App() {
   }, [adminName, currentView]);
 
 
+  // ⭐️ NEW EFFECT HOOK for QR Scan Login ⭐️
+  useEffect(() => {
+    const savedMemberJson = sessionStorage.getItem(SCANNED_MEMBER_KEY);
+    
+    if (savedMemberJson) {
+      try {
+        const memberData = JSON.parse(savedMemberJson);
+        
+        // 1. Log the user in
+        setMemberUser(memberData);
+        
+        // 2. Change the view to the dashboard
+        setCurrentView(VIEWS.MEMBER_DASHBOARD);
+        
+        // 3. Clean up the Session Storage token
+        sessionStorage.removeItem(SCANNED_MEMBER_KEY);
+        
+      } catch (e) {
+        console.error("Failed to parse scanned member data from session storage:", e);
+        sessionStorage.removeItem(SCANNED_MEMBER_KEY); 
+      }
+    }
+  }, []); // Run only once on component mount
+
+
   // --- GENERAL HANDLERS ---
   
   // Handler for Admin Login
@@ -336,14 +420,13 @@ function App() {
     setCurrentView(VIEWS.ADMIN_DASHBOARD); 
   };
 
-  // ⭐️ NEW HANDLER: Member Login Success
+  // ⭐️ EXISTING HANDLER: Member Login Success (Used by MemberAuth.jsx)
   const handleMemberLoginSuccess = (memberData) => {
       console.log("Member Logged In:", memberData);
       setMemberUser(memberData);
       
-      // After login, we redirect them to the Business Register page 
-      // (Assuming this is the goal: Members register businesses)
-      setCurrentView(VIEWS.MEMBER_DASHBOARD); // ⭐️ REDIRECT TO DASHBOARD
+      // After login, we redirect them to the Dashboard
+      setCurrentView(VIEWS.MEMBER_DASHBOARD); 
   };
 
   // Handler for adding a new Industry Type (used in AdminDashboard Settings)
@@ -485,10 +568,10 @@ function App() {
   return (
     <Router> 
         <Routes>
-            {/* 1. Dedicated Route for QR Code Scanning */}
+            {/* 1. Dedicated Route for QR Code Scanning - Renders ScanPage */}
             <Route path="/scan" element={<ScanPage />} /> 
 
-            {/* 2. Main Application Content (Your State-Based Router) */}
+            {/* 2. Main Application Content - Renders your state-based views */}
             <Route path="*" element={
                 <div className="app-container">
                     {ContentComponent}
@@ -499,4 +582,4 @@ function App() {
   )
 }
 
-export default App;
+export default App;         
