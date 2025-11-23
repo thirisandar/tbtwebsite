@@ -1435,8 +1435,8 @@ const QRCodeDisplay = ({ phoneNum, pin, ownerName, onClose }) => {
     // The final URL to be encoded in the QR code (This is still needed for scanning functionality)
     // IMPORTANT: Replace 'https://yourdomain.com' with your actual live domain.
     // Use 'http://localhost:5173' for local testing.
-    const baseUrl = "https://yourdomain.com/scan?data="; 
-    const dataString = `${baseUrl}${rawData}`; 
+    const baseUrl = "https://tbtwebsite-ten.vercel.app/scan?data="; 
+    const dataString = `${baseUrl}${rawData}`;
 
     return (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50" onClick={onClose}>

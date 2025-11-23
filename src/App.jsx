@@ -222,13 +222,16 @@
 
 // export default App;
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "./pages/UserSite/Home.jsx";
+
 import AdminLogin from "./pages/Admin/AdminLogin.jsx";
 import BusinessRegister from "./pages/Admin/BusinessRegister.jsx";
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import MemberAuth from "./pages/UserSite/MemberAuth.jsx"; // ⭐️ NEW IMPORT
 import MemberDashboard from "./pages/UserSite/MemberDashboard.jsx"; // ⭐️ NEW IMPORT
 import { INITIAL_BUSINESS_DATA } from './data/adminDashboardData'; 
+import ScanPage from "./pages/UserSite/ScanPage.jsx";
 
 const VIEWS = {
   HOME:'home',
@@ -480,9 +483,19 @@ function App() {
   }
   
   return (
-       <div className="app-container">
-          {ContentComponent}
-       </div>
+    <Router> 
+        <Routes>
+            {/* 1. Dedicated Route for QR Code Scanning */}
+            <Route path="/scan" element={<ScanPage />} /> 
+
+            {/* 2. Main Application Content (Your State-Based Router) */}
+            <Route path="*" element={
+                <div className="app-container">
+                    {ContentComponent}
+                </div>
+            } />
+        </Routes>
+   </Router>
   )
 }
 
