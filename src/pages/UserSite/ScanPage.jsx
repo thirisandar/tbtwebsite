@@ -56,8 +56,7 @@ const ScanPage = () => {
                 // ⭐️ STEP 2: Redirect to the app root to activate App.jsx login logic ⭐️
                 setTimeout(() => {
                     // This forces a full refresh which re-mounts App.jsx and checks Session Storage
-                    window.location.replace('/'); 
-                }, 1000); 
+                    window.location.replace('/member-dashboard');                }, 1000); 
 
             } catch (error) {
                 console.error("Error during QR login:", error);

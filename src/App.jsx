@@ -639,17 +639,42 @@ function App() {
   
   return (
     <Router> 
-        <Routes>
-            {/* 1. Dedicated Route for QR Code Scanning - Renders ScanPage */}
-            <Route path="/scan" element={<ScanPage />} /> 
 
-            {/* 2. Main Application Content - Renders your state-based views */}
-            <Route path="*" element={
-                <div className="app-container">
-                    {ContentComponent}
-                </div>
-            } />
-        </Routes>
+<Routes>
+    {/* 1. Dedicated Route for QR Code Scanning - Renders ScanPage */}
+    <Route path="/scan" element={<ScanPage />} /> 
+
+    {/* ⭐️ NEW ROUTE: Targets the dashboard directly from the QR scan ⭐️ */}
+    <Route path="/member-dashboard" element={
+        <div className="app-container">
+            {/* Force the dashboard view */}
+            {memberUser ? (
+                <MemberDashboard 
+                    setCurrentView={setCurrentView} 
+                    views={VIEWS} 
+                    memberUser={memberUser} 
+                    onLogout={handleMemberLogout} 
+                />
+            ) : (
+                // Fallback if session is lost, redirect to home
+                <Home 
+                    setCurrentView={setCurrentView} 
+                    views={VIEWS} 
+                    memberUser={memberUser} 
+                    onMemberLoginSuccess={handleMemberLoginSuccess} 
+                    onMemberLogout={handleMemberLogout} 
+                />
+            )}
+        </div>
+    } />
+
+    {/* 2. Main Application Content - Renders your state-based views (Default) */}
+    <Route path="*" element={
+        <div className="app-container">
+            {ContentComponent}
+        </div>
+    } />
+</Routes>
    </Router>
   )
 }

@@ -663,9 +663,8 @@ const renderMainContent = () => {
     // ⭐️ FIX 3: If member is logged in, force the redirect to the full dashboard ⭐️
     if (memberUser) {
         // This stops Home.jsx from rendering the incomplete directory
-        setCurrentView(views.MEMBER_DASHBOARD); 
-        return <div className="text-center p-12">Redirecting...</div>;
-    }
+        return <ActiveBusinessDirectory />;
+    }               
     
     // If not logged in, continue with the login/registration form
     return (
