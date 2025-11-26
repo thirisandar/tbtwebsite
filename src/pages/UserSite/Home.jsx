@@ -283,7 +283,7 @@ function Home({ setCurrentView, views, onMemberLoginSuccess = () => {} }) {
 
                     <button 
                         onClick={navigateToAdminLogin}
-                        className="px-6 py-2 cursor-pointer bg-blue-400 text-gray-800 font-medium rounded-full hover:bg-blue-800 hover:text-white transition duration-150 shadow-md text-base"
+                        className="sm:px-6 py-2 px-4 py-1 cursor-pointer bg-blue-400 text-gray-800 font-medium rounded-full hover:bg-blue-800 hover:text-white transition duration-150 shadow-md text-base"
                      >
                         Admin Login
                      </button>
