@@ -1,0 +1,132 @@
+// File: src/pages/UserSite/ActiveBusinessDirectory.jsx
+
+import React, { useState, useEffect, useMemo } from 'react';
+import PopUpModal from '../../components/PopUpModal.jsx'; 
+import { db } from '../../firebase'; 
+import { collection, query, where, onSnapshot } from 'firebase/firestore'; 
+
+// --- Sub-Components ---
+const LoadingSpinner = () => (
+    <div className="flex flex-col items-center justify-center py-12 col-span-full">
+        <svg className="animate-spin h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p className="mt-3 text-lg text-gray-500">Loading Businesses...</p>
+    </div>
+);
+
+const CardBox = ({ business, onModalOpen }) => (
+    <div className="bg-white p-5 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100 hover:border-blue-300 flex flex-col justify-between">
+        <div>
+            <h3 className="text-xl font-semibold text-gray-800">{business['Business Name']}</h3>
+            <p className="text-sm text-blue-700 mt-1 mb-3 bg-blue-100 px-2 py-0.5 inline-block rounded-full font-medium">
+                {business['Industry Type']}
+            </p>
+        </div>
+        <button 
+            onClick={() => onModalOpen(business)} 
+            className="w-full mt-4 py-2 bg-blue-300 text-gray-600 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition duration-150 shadow-md cursor-pointer"
+        >
+            View Details
+        </button>
+    </div>
+);
+
+function ActiveBusinessDirectory() {
+    const [businesses, setBusinesses] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeFilter, setActiveFilter] = useState('All'); 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedBusiness, setSelectedBusiness] = useState(null);
+    
+    // Firebase Fetch Logic
+    useEffect(() => {
+        const q = query(collection(db, 'businesses'), where('Status', '==', 'Active'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            setBusinesses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            setIsLoading(false);
+        }, (err) => { setIsLoading(false); console.error("Error fetching businesses:", err); });
+        return () => unsubscribe();
+    }, []); 
+
+    // Filter Logic
+    const DYNAMIC_FILTER_CATEGORIES = useMemo(() => {
+        const uniqueIndustries = [...new Set(businesses.map(b => b['Industry Type']))].filter(Boolean).sort();
+        return ['All', ...uniqueIndustries];
+    }, [businesses]);
+    
+    const filteredBusinesses = useMemo(() => {
+        return businesses
+        .filter(b => activeFilter === 'All' || b['Industry Type'] === activeFilter)
+        .filter(b => {
+            const s = searchTerm.toLowerCase();
+            return b['Business Name']?.toLowerCase().includes(s) || 
+                   b['Industry Type']?.toLowerCase().includes(s) || 
+                   b['Physical Address']?.toLowerCase().includes(s) || 
+                   b['Owner Name']?.toLowerCase().includes(s);
+        });
+    }, [businesses, activeFilter, searchTerm]);
+
+    const handleModalOpen = (b) => { setSelectedBusiness(b); setIsModalOpen(true); };
+    const handleModalClose = () => { setIsModalOpen(false); setSelectedBusiness(null); };
+
+    return (
+        <>
+            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
+                လက်ရှိ‌activeဖြစ်‌‌ေနသောစီးပွားရေးများ
+                </h2>
+                <span className="text-blue-600">{businesses.length} Active Business</span> 
+                <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch mt-3">
+                    <input 
+                        type="text" 
+                        placeholder="Search by name, type, or location..." 
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                        className="w-full flex-grow p-3 border border-gray-300 rounded-lg focus:border-gray-500 focus:outline-none" 
+                    />
+                    <div className="relative w-full md:w-1/4">
+                        <select 
+                            value={activeFilter} 
+                            onChange={(e) => setActiveFilter(e.target.value)} 
+                            className="appearance-none w-full p-3 border border-gray-300 rounded-lg bg-white focus:border-blue-300 focus:outline-none"
+                        >
+                            {DYNAMIC_FILTER_CATEGORIES.map(type => <option key={type} value={type}>{type === 'All' ? 'Filter by Type' : type}</option>)}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex space-x-3 mb-8 border-b border-gray-200 pb-2 overflow-x-auto">
+                {DYNAMIC_FILTER_CATEGORIES.map(category => (
+                    <button 
+                        key={category} 
+                        onClick={() => setActiveFilter(category)} 
+                        className={`py-2 px-4 rounded-full font-medium text-sm whitespace-nowrap transition duration-150 
+                            ${activeFilter === category 
+                                ? 'bg-blue-600 text-white shadow-md' 
+                                : 'text-gray-700 bg-white border border-gray-200 hover:bg-blue-50 hover:text-gray-700'
+                            }`}
+                    >
+                        {category === 'All' ? 'All Types' : category}
+                    </button>
+                ))}
+            </div>
+
+            {/* Business Grid */}
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {isLoading ? (
+                    <LoadingSpinner />
+                ) : filteredBusinesses.length > 0 ? (
+                    filteredBusinesses.map(b => <CardBox key={b.id} business={b} onModalOpen={handleModalOpen} />)
+                ) : <p className="col-span-full text-center text-gray-500">No active businesses found matching your criteria.</p>}
+            </div>
+
+            {isModalOpen && <PopUpModal onClose={handleModalClose} data={selectedBusiness} />}
+        </>
+    );
+}
+export default ActiveBusinessDirectory;
