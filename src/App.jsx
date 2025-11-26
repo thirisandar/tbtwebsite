@@ -471,8 +471,8 @@ function App() {
       localStorage.setItem(MEMBER_DATA_KEY, JSON.stringify(memberData));
       
       // We set the view to HOME, which will now display the MemberBusinessList
-      setCurrentView(VIEWS.HOME); 
-  };
+      setCurrentView(VIEWS.MEMBER_DASHBOARD);
+    };
   
   // ⭐️ CRUCIAL FIX 2: Member Logout Handler ⭐️
   const handleMemberLogout = () => {
@@ -628,7 +628,8 @@ function App() {
                                 onDeleteBusiness={deleteBusiness}
                                 currentIndustryOptions={currentIndustryOptions} 
                                 onAddIndustry={onAddIndustry}                     
-                                onRegisterBusiness={handleRegisterBusiness}       
+                                onRegisterBusiness={handleRegisterBusiness}
+                                onMemberLoginSuccess={handleMemberLoginSuccess}       
                             />;
       break; 
       
