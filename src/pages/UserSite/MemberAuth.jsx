@@ -25,29 +25,12 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [memberCode, setMemberCode] = useState(''); // 6 digit code
 
-    // ⭐️ AUTO-FILL LOGIC (Remember Me) + AGGRESSIVE BROWSER CLEAR ⭐️
-    useEffect(() => {
-        // 1. Check/load saved member data (your "Remember Me")
-        const savedMember = localStorage.getItem(MEMBER_DATA_KEY);
-        if (savedMember) {
-            const { phone, code } = JSON.parse(savedMember);
-            setPhoneNumber(phone);
-            setMemberCode(code);
-        }
-
-        // 2. ⭐️ AGGRESSIVE FIX: Delayed clear for aggressive browser autofill ⭐️
-        const resetTimer = setTimeout(() => {
-            setPhoneNumber('');
-            setMemberCode('');
-        }, 50); // 50ms delay is usually enough to let autofill execute
-
-        return () => clearTimeout(resetTimer); 
-    }, []); // Run only once on mount
-
-
-    // ⭐️ NEW HANDLER: Clears all input fields and Local Storage ⭐️
+    // ⭐️ MODIFIED: Removed useEffect for Local Storage loading/autofill ⭐️
+    // Fields will now start empty every time the component loads.
+    
+    // ⭐️ MODIFIED: Cleaned up clear handler - Local storage is no longer used ⭐️
     const handleClearFormAndStorage = (newIsRegisteringValue) => {
-        // 1. Clear Local Storage (CRITICAL FIX for Remember Me feature)
+        // 1. Clear Local Storage (Safety measure, though we no longer write to it)
         localStorage.removeItem(MEMBER_DATA_KEY);
         
         // 2. Clear form state
@@ -94,14 +77,10 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
                 role: 'member'
             });
 
-            // 3. Remember Me (Save to Local Storage)
-            localStorage.setItem(MEMBER_DATA_KEY, JSON.stringify({
-                phone: phoneNumber,
-                code: memberCode
-            }));
-
-            setSuccessMsg("Registration Successful! You can now login.");
+            setSuccessMsg("Registration Successful! Please log in again with your ph num and pin code");
             setOwnerName(''); 
+            setPhoneNumber(''); 
+            setMemberCode(''); 
             setIsRegistering(false); // Switch to login view
             
         } catch (err) {
@@ -118,6 +97,13 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
         setError('');
         setIsLoading(true);
 
+        if (memberCode.length !== 6) {
+            setError("The Member Code must be exactly 6 digits.");
+            setIsLoading(false);
+            return;
+        }
+
+
         try {
             const q = query(
                 collection(db, 'members'), 
@@ -130,11 +116,7 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
                 const memberDoc = querySnapshot.docs[0];
                 const memberData = memberDoc.data();
                 
-                // Update Local Storage to ensure it's current
-                localStorage.setItem(MEMBER_DATA_KEY, JSON.stringify({
-                    phone: phoneNumber,
-                    code: memberCode
-                }));
+                // ⭐️ MODIFIED: NO LOCAL STORAGE SAVE ⭐️
 
                 onMemberLoginSuccess(memberData); 
                 
@@ -143,7 +125,7 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
                 setMemberCode('');
                 
             } else {
-                setError("Invalid Phone Number or Member Code.");
+                setError("Invalid Login Details. Please check your Phone Number and 6-Digit Member Code.");
             }
         } catch (err) {
             console.error("Login Error:", err);
@@ -204,7 +186,7 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
                             onChange={(e) => setPhoneNumber(e.target.value)} 
                             placeholder="e.g., 09xxxxxxxxx"
                             className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-800 transition" 
-                            autoComplete="tbt-user-phone" 
+                            autoComplete="off" // Ensures no browser autofill
                             data-lpignore="true"
                         />
                     </div>
@@ -223,7 +205,7 @@ function MemberAuth({ setCurrentView, views, onMemberLoginSuccess }) {
                             }} 
                             placeholder="123456"
                             className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-800 transition" 
-                            autoComplete="tbt-user-pin"
+                            autoComplete="off" // Ensures no browser autofill
                             data-lpignore="true"
                         />
                     </div>

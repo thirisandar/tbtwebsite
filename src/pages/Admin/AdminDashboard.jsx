@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo,useRef } from 'react';
 import QRCode from 'react-qr-code'; 
 import { auth, db } from '../../firebase';
 import { 
@@ -83,27 +83,179 @@ const ConfirmModal = ({ itemName, itemType, onConfirm, onCancel }) => {
 };
 
 // ⭐️ DESIGN CHANGE ⭐️ Updated QRCodeDisplay to a light theme
+// const QRCodeDisplay = ({ phoneNum, pin, ownerName, onClose }) => {
+    
+//     // The data to be encoded (Phone Number-Pin)
+//     const rawData = `${phoneNum}-${pin}`;
+    
+//     const baseUrl = "https://tbtwebsite-ten.vercel.app/scan?data="; 
+//     const dataString = `${baseUrl}${rawData}`;
+
+//     return (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
+//             <div 
+//                 className="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center border border-gray-200" 
+//                 onClick={e => e.stopPropagation()} 
+//             >
+//                 <h3 className="text-xl font-bold text-gray-800 mb-2">Member QR Code</h3>
+                
+//                 {/* 1. Owner Name */}
+//                 <p className="text-xl font-semibold text-blue-600 mb-4">{ownerName}</p>
+                
+//                 {/* 2. QR Code Photo */}
+//                 <div className="bg-white p-4 rounded-lg flex items-center justify-center h-64 w-64 mx-auto border border-gray-300">
+//                      <QRCode 
+//                         value={dataString} 
+//                         size={256} 
+//                         style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+//                      /> 
+//                 </div>
+                
+//                 {/* 3. Display Phone Number and PIN (Clean Display) */}
+//                 <div className="mt-4 space-y-2 p-3 bg-gray-100 rounded-lg border border-gray-200">
+//                     <div className="flex justify-between items-center">
+//                         <p className="text-sm font-medium text-gray-600">Phone Number:</p>
+//                         <p className="text-lg font-bold text-gray-800">{phoneNum}</p>
+//                     </div>
+                    
+//                     <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+//                         <p className="text-sm font-medium text-gray-600">PIN:</p>
+//                         <p className="text-lg font-bold text-green-600">{pin}</p>
+//                     </div>
+//                 </div>
+                
+//                 <button onClick={onClose} className="mt-6 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Close</button>
+//             </div>
+//         </div>
+//     );
+// };
 const QRCodeDisplay = ({ phoneNum, pin, ownerName, onClose }) => {
+    const qrRef = useRef(null); // Reference for the QR SVG
     
-    // The data to be encoded (Phone Number-Pin)
     const rawData = `${phoneNum}-${pin}`;
-    
     const baseUrl = "https://tbtwebsite-ten.vercel.app/scan?data="; 
     const dataString = `${baseUrl}${rawData}`;
+
+    // Function to download the QR code as a PNG file, including text details
+    const handleDownloadQR = () => {
+        if (!qrRef.current) return;
+
+        const svgElement = qrRef.current.querySelector('svg');
+        const svgString = new XMLSerializer().serializeToString(svgElement);
+        
+        // Encode SVG string to base64 data URL
+        const svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+        
+        const canvas = document.createElement('canvas');
+        // Define sizes for the final PNG and the QR image within it
+        const CANVAS_WIDTH = 512;
+        const CANVAS_HEIGHT = 650; // Increased height to accommodate text
+        const QR_SIZE = 400;
+        const PADDING = (CANVAS_WIDTH - QR_SIZE) / 2;
+        
+        const img = new Image();
+        
+        img.onload = function() {
+            canvas.width = CANVAS_WIDTH;
+            canvas.height = CANVAS_HEIGHT;
+            const ctx = canvas.getContext('2d');
+            
+            // 1. Draw White Background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            // 2. Draw Text Content
+            
+            // Title: Member QR Code
+            ctx.fillStyle = '#0f172a'; // Tailwind gray-900 equivalent
+            ctx.font = 'bold 30px sans-serif'; // Use sans-serif for better default font support
+            ctx.textAlign = 'center';
+            ctx.fillText('Member Name', CANVAS_WIDTH / 2, 50);
+
+            // Owner Name
+            ctx.font = '24px sans-serif';
+            ctx.fillStyle = '#1e40af'; // Tailwind blue-700 equivalent
+            ctx.fillText(ownerName, CANVAS_WIDTH / 2, 90);
+
+            // 3. Draw QR Code Image (centered)
+            const qrX = PADDING;
+            const qrY = 120; // Position QR code below the header text
+            ctx.drawImage(img, qrX, qrY, QR_SIZE, QR_SIZE);
+            
+            // 4. Draw Footer Details (Phone Number and PIN)
+
+            // Horizontal line separator
+            ctx.strokeStyle = '#e5e7eb'; // Tailwind gray-200 equivalent
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(PADDING, CANVAS_HEIGHT - 100);
+            ctx.lineTo(CANVAS_WIDTH - PADDING, CANVAS_HEIGHT - 100);
+            ctx.stroke();
+
+            // Phone Number
+            ctx.fillStyle = '#4b5563'; // Tailwind gray-600 equivalent
+            ctx.font = '18px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Phone Number:', PADDING, CANVAS_HEIGHT - 65);
+            
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillText(phoneNum, CANVAS_WIDTH - PADDING, CANVAS_HEIGHT - 65);
+
+            // PIN
+            ctx.textAlign = 'left';
+            ctx.font = '18px sans-serif';
+            ctx.fillText('PIN:', PADDING, CANVAS_HEIGHT - 30);
+            
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillStyle = '#059669'; // Tailwind green-600 equivalent
+            ctx.fillText(pin, CANVAS_WIDTH - PADDING, CANVAS_HEIGHT - 30);
+
+            // 5. Get the final PNG data URL and trigger download
+            const pngFile = canvas.toDataURL('image/png');
+            
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pngFile;
+            
+            const fileName = ownerName ? ownerName.replace(/\s/g, '_') : 'TBT_Member';
+            downloadLink.download = `${fileName}_QR_Details.png`; 
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        };
+        
+        img.src = svgDataUrl;
+    };
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
             <div 
-                className="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center border border-gray-200" 
+                className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full text-center relative border border-gray-200" 
                 onClick={e => e.stopPropagation()} 
             >
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Member QR Code</h3>
+                
+                {/* ⭐️ CLOSE Button (Top Right - Red Color) ⭐️ */}
+                <button 
+                    onClick={onClose} 
+                    className="absolute top-4 right-4 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition flex items-center justify-center text-sm font-semibold shadow-md z-10 cursor-pointer"
+                    title="Close QR Code Modal">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <h3 className="text-2xl font-bold text-gray-800 text-center mb-2">
+                    Member Name
+                </h3>
                 
                 {/* 1. Owner Name */}
-                <p className="text-xl font-semibold text-blue-600 mb-4">{ownerName}</p>
+                    <p className="text-xl font-semibold text-blue-600 mb-2">{ownerName}</p>
                 
                 {/* 2. QR Code Photo */}
-                <div className="bg-white p-4 rounded-lg flex items-center justify-center h-64 w-64 mx-auto border border-gray-300">
+                <div ref={qrRef} className="bg-white p-4 rounded-lg flex items-center justify-center h-64 w-64 mx-auto border border-gray-300">
                      <QRCode 
                         value={dataString} 
                         size={256} 
@@ -124,24 +276,237 @@ const QRCodeDisplay = ({ phoneNum, pin, ownerName, onClose }) => {
                     </div>
                 </div>
                 
-                <button onClick={onClose} className="mt-6 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Close</button>
+                {/* ⭐️ DOWNLOAD QR Button (Bottom - Blue Color) ⭐️ */}
+                <button onClick={handleDownloadQR} 
+                    className="mt-6 w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition cursor-pointer flex items-center justify-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>Download QR (PNG)</span>
+                </button>
             </div>
+        </div>
+    );
+};
+// Used for displaying the logo in list/card views, like KanbanBoard
+const LogoDisplay = ({ logoUrl, businessName }) => {
+    // Local state to track loading failure for this specific image instance
+    const [loadError, setLoadError] = useState(false); 
+    
+    // Check if the URL is valid (starts with http/https)
+    const isUrlValid = logoUrl && (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'));
+    
+    useEffect(() => {
+        setLoadError(false);
+    }, [logoUrl]);
+
+    if (!isUrlValid) {
+        return (
+            <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded-lg border border-gray-200"> 
+                {logoUrl ? `Saved URL is invalid or placeholder: ${logoUrl}` : 'No logo currently saved for this business.' }
+            </p>
+        );
+    }
+
+    return (
+        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+            {loadError ? (
+                <p className="text-sm text-red-500 mb-2 font-medium">
+                    Error: Could not load image from saved URL.
+                </p>
+            ) : (
+                <img 
+                    key={logoUrl} 
+                    src={logoUrl} 
+                    alt={`Logo for ${businessName}`} 
+                    className="w-12 h-12 object-contain rounded border border-green-300 p-0.5 mb-2" 
+                    onError={() => { 
+                        setLoadError(true); // If the image fails to load (e.g., broken Google Drive link), show error
+                    }} 
+                />
+            )}
+            
+            <p className="text-sm text-gray-600 truncate"> 
+                Current Logo/URL: <a href={logoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">View Saved Logo</a>
+            </p>
         </div>
     );
 };
 
 // ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
+// const BusinessView = ({ business, onBack }) => {
+//     const displayKeys = [
+//         'Business Name', 'Owner Name', 'Industry Type', 'Status', 'Logo URL', 
+//         'Physical Address', 'Email Address', 'Phone Number', 'Viber Number', 
+//         'Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link', 
+//         'Created Date'
+//     ];
+
+//     const getDisplayValue = (key, value) => {
+//         if (!value) { return 'N/A'; }
+//         if (key === 'Logo URL' && (value.startsWith('http://') || value.startsWith('https://'))) {
+//             const maxLength = 50; 
+//             if (value.length > maxLength) {
+//                 const start = value.substring(0, 25);
+//                 const end = value.substring(value.length - 20);
+//                 return `${start}...${end}`;
+//             }
+//         }
+//         if (key === 'Created Date') {
+//             return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+//         }
+//         return value;
+//     };
+
+//     return (
+//         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+//             <h3 className="text-2xl font-bold text-gray-800 mb-6">Business Details (View Only)</h3>
+            
+//             {business['Logo URL'] && business['Logo URL'].trim().length > 0 && !business['Logo URL'].startsWith('data:image/') && (
+//                 <div className="mb-6">
+//                     <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
+//                     <img src={business['Logo URL']} alt="Logo Preview" className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" />
+//                 </div>
+//             )}
+            
+//             <div className="space-y-4">
+//                 {displayKeys.map(key => (
+//                     <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+//                         <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">{key}</label>
+//                         <p className="text-gray-700 font-semibold">{getDisplayValue(key, business[key])}</p>
+//                     </div>
+//                 ))}
+//             </div>
+            
+//             <div className="pt-6 border-t border-gray-200 mt-6">
+//                 <button type="button" onClick={onBack} className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition cursor-pointer">← Back to Dashboard</button>
+//             </div>
+//         </div>
+//     );
+// };
+// ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
+// const BusinessView = ({ business, onBack }) => {
+    
+//     // ⭐️ INSERTION POINT 1: New state for logo loading error ⭐️
+//     const [logoLoadError, setLogoLoadError] = useState(false);
+    
+//     const logoUrl = business['Logo URL'];
+//     const isLogoUrlValid = logoUrl && (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'));
+    
+//     // Reset error when business or logoUrl changes
+//     useEffect(() => {
+//         setLogoLoadError(false);
+//     }, [logoUrl]);
+
+//     const displayKeys = [
+//         'Business Name', 'Owner Name', 'Industry Type', 'Status', 'Logo URL', 
+//         'Physical Address', 'Email Address', 'Phone Number', 'Viber Number', 
+//         'Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link', 
+//         'Created Date'
+//     ];
+
+//     const getDisplayValue = (key, value) => {
+//         if (!value) { return 'N/A'; }
+        
+//         // This logic is for truncating the display text, not the image rendering
+//         if (key === 'Logo URL' && isLogoUrlValid) {
+//             const maxLength = 50; 
+//             if (value.length > maxLength) {
+//                 const start = value.substring(0, 25);
+//                 const end = value.substring(value.length - 20);
+//                 return `${start}...${end}`;
+//             }
+//         }
+        
+//         if (key === 'Created Date') {
+//             return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+//         }
+//         return value;
+//     };
+
+//     return (
+//         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+//             <h3 className="text-2xl font-bold text-gray-800 mb-6">Business Details (View Only)</h3>
+            
+//             {/* ⭐️ INSERTION POINT 2: Updated Logo Preview Section ⭐️ */}
+//             <div className="mb-6">
+//                 <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
+                
+//                 {/* 1. Check if the URL is valid (http/https) */}
+//                 {isLogoUrlValid ? (
+//                     <>
+//                         {/* 2. Check if there was a loading error */}
+//                         {logoLoadError ? (
+//                             <p className="text-sm text-red-500 mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
+//                                 Error: Could not load image from saved URL. The link might be broken or not publicly accessible.
+//                             </p>
+//                         ) : (
+//                             // 3. Attempt to load the image
+//                             <img 
+//                                 key={logoUrl} // Use key to force re-render if URL changes
+//                                 src={logoUrl} 
+//                                 alt={`Logo for ${business['Business Name']}`} 
+//                                 className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" 
+//                                 onError={() => { 
+//                                     setLogoLoadError(true); // If load fails, set error state
+//                                 }}
+//                             />
+//                         )}
+//                     </>
+//                 ) : (
+//                     // 4. Show fallback for invalid or empty URL
+//                     <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded-lg border border-gray-200">
+//                         {logoUrl && logoUrl.trim().length > 0
+//                             ? `Saved Logo URL is invalid: ${logoUrl}` 
+//                             : 'No logo URL saved for this business.'}
+//                     </p>
+//                 )}
+//             </div>
+//             {/* ⭐️ END Updated Logo Preview Section ⭐️ */}
+            
+//             <div className="space-y-4">
+//                 {displayKeys.map(key => (
+//                     <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+//                         <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">{key}</label>
+//                         <p className="text-gray-700 font-semibold">{getDisplayValue(key, business[key])}</p>
+//                     </div>
+//                 ))}
+//             </div>
+            
+//             <div className="pt-6 border-t border-gray-200 mt-6">
+//                 <button type="button" onClick={onBack} className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition cursor-pointer">← Back to Dashboard</button>
+//             </div>
+//         </div>
+//     );
+// };
+// ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
 const BusinessView = ({ business, onBack }) => {
+    
+    // ⭐️ INSERTION POINT 1: New state for logo loading error ⭐️
+    const [logoLoadError, setLogoLoadError] = useState(false);
+    
+    const logoUrl = business['Logo URL'];
+    const isLogoUrlValid = logoUrl && (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'));
+    
+    // Reset error when business or logoUrl changes
+    useEffect(() => {
+        setLogoLoadError(false);
+    }, [logoUrl]);
+
     const displayKeys = [
         'Business Name', 'Owner Name', 'Industry Type', 'Status', 'Logo URL', 
         'Physical Address', 'Email Address', 'Phone Number', 'Viber Number', 
         'Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link', 
         'Created Date'
     ];
+    
+    const linkFields = ['Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link'];
 
     const getDisplayValue = (key, value) => {
         if (!value) { return 'N/A'; }
-        if (key === 'Logo URL' && (value.startsWith('http://') || value.startsWith('https://'))) {
+        
+        // This logic is for truncating the Logo URL text
+        if (key === 'Logo URL' && isLogoUrlValid) {
             const maxLength = 50; 
             if (value.length > maxLength) {
                 const start = value.substring(0, 25);
@@ -149,29 +514,99 @@ const BusinessView = ({ business, onBack }) => {
                 return `${start}...${end}`;
             }
         }
+        
         if (key === 'Created Date') {
-            return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const date = new Date(value);
+            if (!isNaN(date)) {
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+            return value; 
         }
         return value;
     };
+
+    // ⭐️ NEW HELPER FUNCTION FOR RENDERING ALL FIELDS, INCLUDING LINKS ⭐️
+    const renderBusinessField = (key, value) => {
+        const isLinkField = linkFields.includes(key);
+        const displayValue = getDisplayValue(key, value);
+        
+        return (
+            <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">
+                    {key}
+                    {/* ⭐️ HIGHLIGHTED CHANGE: Instruction for Admin ⭐️ */}
+                    {isLinkField && value && value.trim() !== 'N/A' && (
+                         <span className="ml-2 text-xs text-blue-600 font-normal italic bg-blue-100 px-2 py-0.5 rounded-full">
+                            (Auto-prefixed: https://)
+                         </span>
+                    )}
+                </label>
+                
+                {isLinkField && value && value.trim() !== 'N/A' ? (
+                    // Display as a clickable link, showing the URL without the prefix
+                    <a 
+                        href={value} // Full URL for clicking
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-600 font-semibold hover:text-blue-800 hover:underline break-all"
+                    >
+                        {/* Clean display text (e.g., www.facebook.com/page) */}
+                        {value.replace(/^https?:\/\//, '')} 
+                    </a>
+                ) : (
+                    // Render standard or N/A value
+                    <p className="text-gray-700 font-semibold">{displayValue}</p>
+                )}
+            </div>
+        );
+    };
+    // ⭐️ END NEW LINK RENDERING HELPER ⭐️
+
 
     return (
         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
             <h3 className="text-2xl font-bold text-gray-800 mb-6">Business Details (View Only)</h3>
             
-            {business['Logo URL'] && business['Logo URL'].trim().length > 0 && !business['Logo URL'].startsWith('data:image/') && (
-                <div className="mb-6">
-                    <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
-                    <img src={business['Logo URL']} alt="Logo Preview" className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" />
-                </div>
-            )}
+            {/* ⭐️ INSERTION POINT 2: Updated Logo Preview Section (Retained from previous changes) ⭐️ */}
+            <div className="mb-6">
+                <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
+                
+                {/* 1. Check if the URL is valid (http/https) */}
+                {isLogoUrlValid ? (
+                    <>
+                        {/* 2. Check if there was a loading error */}
+                        {logoLoadError ? (
+                            <p className="text-sm text-red-500 mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
+                                Error: Could not load image from saved URL. The link might be broken or not publicly accessible.
+                            </p>
+                        ) : (
+                            // 3. Attempt to load the image
+                            <img 
+                                key={logoUrl} // Use key to force re-render if URL changes
+                                src={logoUrl} 
+                                alt={`Logo for ${business['Business Name']}`} 
+                                className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" 
+                                onError={() => { 
+                                    setLogoLoadError(true); // If load fails, set error state
+                                }}
+                            />
+                        )}
+                    </>
+                ) : (
+                    // 4. Show fallback for invalid or empty URL
+                    <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded-lg border border-gray-200">
+                        {logoUrl && logoUrl.trim().length > 0
+                            ? `Saved Logo URL is invalid: ${logoUrl}` 
+                            : 'No logo URL saved for this business.'}
+                    </p>
+                )}
+            </div>
+            {/* ⭐️ END Updated Logo Preview Section ⭐️ */}
             
             <div className="space-y-4">
                 {displayKeys.map(key => (
-                    <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">{key}</label>
-                        <p className="text-gray-700 font-semibold">{getDisplayValue(key, business[key])}</p>
-                    </div>
+                    // ⭐️ MODIFIED: Use the new renderBusinessField helper for all fields ⭐️
+                    renderBusinessField(key, business[key])
                 ))}
             </div>
             
@@ -300,6 +735,7 @@ const BusinessDetailView = ({ business, onBack, onUpdateData, setSuccessMessage,
         </div>
     );
 };
+
 
 // ⭐️ DESIGN CHANGE ⭐️ Updated KanbanBoard to a light theme
 const KanbanBoard = ({ businessData, onSelectBusiness, groupByField, title }) => {
@@ -730,7 +1166,7 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
 // --- ⭐️ MAIN COMPONENT: AdminDashboard ⭐️ ---
 // ---------------------------------------------
 function AdminDashboard({ setCurrentView, views, adminName, 
-    adminEmail = 'admin@tbt-corp.com',
+    adminEmail = 'admin@tbt.com',
 }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
@@ -1210,9 +1646,9 @@ function AdminDashboard({ setCurrentView, views, adminName,
                     {/* Logo/Avatar Placeholder (Simple, eye-catchy blue circle) */}
                     <img src="/tbtlogo.jpg" alt="TBT Admin Logo" className="h-12 w-auto mx-auto rounded-full border border-blue-600 p-1" /> 
                     {/* Admin Name */}
-                    <p className="text-lg font-bold text-gray-800 mb-0.5 mt-2">{adminName}</p>
+                    {/* <p className="text-lg font-bold text-gray-800 mb-0.5 mt-2">{adminName}</p> */}
                     {/* Admin Email */}
-                    <p className="text-sm text-gray-500 font-light truncate max-w-full px-2">{adminEmail}</p>
+                    <p className="text-lg font-bold text-gray-800 mb-0.5 mt-2">{adminEmail}</p>
                 </div>
                 {/* ⭐️ END NEW TOP SECTION ⭐️ */}
                 <ul className="flex-grow space-y-2">
