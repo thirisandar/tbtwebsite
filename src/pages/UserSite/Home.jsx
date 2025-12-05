@@ -64,6 +64,7 @@ const renderMainContent = () => {
             <MemberLoginRegistrationForm
                 onMemberLoginSuccess={onMemberLoginSuccess}
             />
+            <ActiveBusinessDirectory />
             {/* If you have ActiveBusinessDirectory here, it only renders when logged out */}
         </>
     );

@@ -151,7 +151,7 @@ function App() {
       
       // After login, we redirect them to the Dashboard
       setCurrentView(VIEWS.HOME); 
-  };                      
+  };                
 
   // Handler for adding a new Industry Type (used in AdminDashboard Settings)
   const onAddIndustry = (newIndustry) => {
@@ -313,7 +313,7 @@ function App() {
   )
 }
 
-// export default App;
+export default App;
 // import React, { useState, useEffect } from 'react';
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // import Home from "./pages/UserSite/Home.jsx";
