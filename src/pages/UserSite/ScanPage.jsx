@@ -51,12 +51,12 @@ const ScanPage = () => {
                 // ⭐️ STEP 1: Save verified member data to Session Storage ⭐️
                 sessionStorage.setItem(SCANNED_MEMBER_KEY, JSON.stringify(member));
                 
-                setStatus('Login successful! Redirecting to Member Dashboard...');
-
+                // setStatus('Login successful! Redirecting to Member Dashboard...');
+                setStatus('Login successful! Redirecting to Home View...');
                 // ⭐️ STEP 2: Redirect to the app root to activate App.jsx login logic ⭐️
                 setTimeout(() => {
                     // This forces a full refresh which re-mounts App.jsx and checks Session Storage
-                    window.location.replace('/member-dashboard');                }, 1000); 
+                    window.location.replace('/');                }, 1000); 
 
             } catch (error) {
                 console.error("Error during QR login:", error);

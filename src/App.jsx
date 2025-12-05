@@ -150,7 +150,7 @@
 //       setMemberUser(memberData);
       
 //       // After login, we redirect them to the Dashboard
-//       setCurrentView(VIEWS.MEMBER_DASHBOARD); 
+//       setCurrentView(VIEWS.HOME); 
 //   };
 
 //   // Handler for adding a new Industry Type (used in AdminDashboard Settings)
@@ -471,7 +471,7 @@ function App() {
       localStorage.setItem(MEMBER_DATA_KEY, JSON.stringify(memberData));
       
       // We set the view to HOME, which will now display the MemberBusinessList
-      setCurrentView(VIEWS.MEMBER_DASHBOARD);
+      setCurrentView(VIEWS.HOME);
     };
   
   // ⭐️ CRUCIAL FIX 2: Member Logout Handler ⭐️

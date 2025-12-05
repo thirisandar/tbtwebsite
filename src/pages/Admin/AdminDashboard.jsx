@@ -333,152 +333,7 @@ const LogoDisplay = ({ logoUrl, businessName }) => {
     );
 };
 
-// ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
-// const BusinessView = ({ business, onBack }) => {
-//     const displayKeys = [
-//         'Business Name', 'Owner Name', 'Industry Type', 'Status', 'Logo URL', 
-//         'Physical Address', 'Email Address', 'Phone Number', 'Viber Number', 
-//         'Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link', 
-//         'Created Date'
-//     ];
 
-//     const getDisplayValue = (key, value) => {
-//         if (!value) { return 'N/A'; }
-//         if (key === 'Logo URL' && (value.startsWith('http://') || value.startsWith('https://'))) {
-//             const maxLength = 50; 
-//             if (value.length > maxLength) {
-//                 const start = value.substring(0, 25);
-//                 const end = value.substring(value.length - 20);
-//                 return `${start}...${end}`;
-//             }
-//         }
-//         if (key === 'Created Date') {
-//             return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-//         }
-//         return value;
-//     };
-
-//     return (
-//         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-//             <h3 className="text-2xl font-bold text-gray-800 mb-6">Business Details (View Only)</h3>
-            
-//             {business['Logo URL'] && business['Logo URL'].trim().length > 0 && !business['Logo URL'].startsWith('data:image/') && (
-//                 <div className="mb-6">
-//                     <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
-//                     <img src={business['Logo URL']} alt="Logo Preview" className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" />
-//                 </div>
-//             )}
-            
-//             <div className="space-y-4">
-//                 {displayKeys.map(key => (
-//                     <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-//                         <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">{key}</label>
-//                         <p className="text-gray-700 font-semibold">{getDisplayValue(key, business[key])}</p>
-//                     </div>
-//                 ))}
-//             </div>
-            
-//             <div className="pt-6 border-t border-gray-200 mt-6">
-//                 <button type="button" onClick={onBack} className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition cursor-pointer">← Back to Dashboard</button>
-//             </div>
-//         </div>
-//     );
-// };
-// ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
-// const BusinessView = ({ business, onBack }) => {
-    
-//     // ⭐️ INSERTION POINT 1: New state for logo loading error ⭐️
-//     const [logoLoadError, setLogoLoadError] = useState(false);
-    
-//     const logoUrl = business['Logo URL'];
-//     const isLogoUrlValid = logoUrl && (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'));
-    
-//     // Reset error when business or logoUrl changes
-//     useEffect(() => {
-//         setLogoLoadError(false);
-//     }, [logoUrl]);
-
-//     const displayKeys = [
-//         'Business Name', 'Owner Name', 'Industry Type', 'Status', 'Logo URL', 
-//         'Physical Address', 'Email Address', 'Phone Number', 'Viber Number', 
-//         'Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link', 
-//         'Created Date'
-//     ];
-
-//     const getDisplayValue = (key, value) => {
-//         if (!value) { return 'N/A'; }
-        
-//         // This logic is for truncating the display text, not the image rendering
-//         if (key === 'Logo URL' && isLogoUrlValid) {
-//             const maxLength = 50; 
-//             if (value.length > maxLength) {
-//                 const start = value.substring(0, 25);
-//                 const end = value.substring(value.length - 20);
-//                 return `${start}...${end}`;
-//             }
-//         }
-        
-//         if (key === 'Created Date') {
-//             return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-//         }
-//         return value;
-//     };
-
-//     return (
-//         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-//             <h3 className="text-2xl font-bold text-gray-800 mb-6">Business Details (View Only)</h3>
-            
-//             {/* ⭐️ INSERTION POINT 2: Updated Logo Preview Section ⭐️ */}
-//             <div className="mb-6">
-//                 <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
-                
-//                 {/* 1. Check if the URL is valid (http/https) */}
-//                 {isLogoUrlValid ? (
-//                     <>
-//                         {/* 2. Check if there was a loading error */}
-//                         {logoLoadError ? (
-//                             <p className="text-sm text-red-500 mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
-//                                 Error: Could not load image from saved URL. The link might be broken or not publicly accessible.
-//                             </p>
-//                         ) : (
-//                             // 3. Attempt to load the image
-//                             <img 
-//                                 key={logoUrl} // Use key to force re-render if URL changes
-//                                 src={logoUrl} 
-//                                 alt={`Logo for ${business['Business Name']}`} 
-//                                 className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" 
-//                                 onError={() => { 
-//                                     setLogoLoadError(true); // If load fails, set error state
-//                                 }}
-//                             />
-//                         )}
-//                     </>
-//                 ) : (
-//                     // 4. Show fallback for invalid or empty URL
-//                     <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded-lg border border-gray-200">
-//                         {logoUrl && logoUrl.trim().length > 0
-//                             ? `Saved Logo URL is invalid: ${logoUrl}` 
-//                             : 'No logo URL saved for this business.'}
-//                     </p>
-//                 )}
-//             </div>
-//             {/* ⭐️ END Updated Logo Preview Section ⭐️ */}
-            
-//             <div className="space-y-4">
-//                 {displayKeys.map(key => (
-//                     <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-//                         <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">{key}</label>
-//                         <p className="text-gray-700 font-semibold">{getDisplayValue(key, business[key])}</p>
-//                     </div>
-//                 ))}
-//             </div>
-            
-//             <div className="pt-6 border-t border-gray-200 mt-6">
-//                 <button type="button" onClick={onBack} className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition cursor-pointer">← Back to Dashboard</button>
-//             </div>
-//         </div>
-//     );
-// };
 // ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
 const BusinessView = ({ business, onBack }) => {
     
@@ -1116,8 +971,8 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
                                                 ) : col.key === 'Status' ? (
                                                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                                         business.Status === 'Active' ? 'bg-green-100 text-green-800' :
-                                                        business.Status === 'Pending Review' ? 'bg-yellow-100 text-yellow-800' :
-                                                        business.Status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                                                        business.Status === 'Pending Review' ? 'bg-yellow-100 text-red-800' :
+                                                        business.Status === 'Rejected' ? 'bg-red-100 text-yellow-800' :
                                                         'bg-gray-100 text-gray-800'
                                                     }`}>
                                                         {business.Status}
@@ -1518,6 +1373,23 @@ function AdminDashboard({ setCurrentView, views, adminName,
         return activeNavItem;
     };
     
+    // Color Status
+    const StatusDisplay = ({ status }) => {
+        // Determine the text color: Red for 'Pending Review', Green for 'Active', or default color.
+        const textColor = status === 'Pending Review' 
+            ? 'text-red-600' // Apply red color
+            : status === 'Active' 
+            ? 'text-green-600' // Use green for active/approved
+            : 'text-gray-500'; // Default for other statuses
+    
+        return (
+            <span className={`font-semibold ${textColor}`}>
+                Status: {status}
+            </span>
+        );
+    };
+
+
     // ⭐️ RENDER CONTENT ⭐️
     const renderContent = () => {
         if (isLoading && activeNavItem !== 'Business Owner') {
