@@ -130,7 +130,7 @@ function MemberBusinessList({ memberUser, views, setCurrentView }) {
                 
                 <div className="py-6 sm:py-8 mb-4 sm:mb-8 text-black border-b border-gray-200">
                     <h1 className="text-xl sm:text-2xl font-bold mb-1">
-                        မဂ်လာပါ , {welcomeName}! 
+                         {welcomeName}! 
                     </h1>
                     <p className="text-sm sm:text-base text-gray-700">
                         This is your personal dashboard view of all registered businesses.

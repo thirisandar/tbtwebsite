@@ -76,7 +76,7 @@ function ActiveBusinessDirectory() {
         <>
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
-                လက်ရှိ‌activeဖြစ်‌‌ေနသောစီးပွားရေးများ
+                    TBT Member ၀င်များ၏ စီးပွားရေးများ
                 </h2>
                 <span className="text-blue-600">{businesses.length} Active Business</span> 
                 <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch mt-3">

@@ -210,12 +210,9 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
                 {/* 2. WELCOME BANNER (Full Width) */}
                 <div className="py-6 sm:py-8 mb-4 sm:mb-8 text-black bg-white shadow-sm border-b border-gray-200">
                     <div className="container mx-auto max-w-6xl px-4 sm:px-0">
-                        <h1 className="text-xl sm:text-2xl font-bold mb-1">
-                            မဂ်လာပါ , {welcomeName}! 
-                        </h1>
-                        <p className="text-sm sm:text-base text-gray-700">
-                            This is your personal member dashboard. Your login phone number is **{memberPhone}**.
-                        </p>
+                        <h1 className="text-xl sm:text-2xl font-semibold mb-1">
+                            Member Name - {welcomeName}
+                        </h1>   
                     </div>
                 </div>
                 

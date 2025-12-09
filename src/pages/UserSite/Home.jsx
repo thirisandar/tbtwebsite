@@ -16,13 +16,13 @@ function Home({ setCurrentView, views, memberUser, onMemberLoginSuccess, onMembe
         return (
             <div className="flex space-x-3 items-center">
                 <p className="hidden sm:block text-sm font-medium text-gray-700">
-                Homepageမှကြိုဆိုပါသည်, {memberUser['Owner Name'] || 'Member'}
+                 {memberUser['Owner Name'] || 'Member'}
                 </p>
                 <button 
                     onClick={() => setCurrentView(views.MEMBER_DASHBOARD)} 
                     className="sm:px-4 py-2 px-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-800 transition duration-150 shadow-md text-sm cursor-pointer"
                 >
-                   Go to dashboard
+                   Profile
                 </button>
                  <button 
                     onClick={onMemberLogout} // Call the logout handler from App.jsx
