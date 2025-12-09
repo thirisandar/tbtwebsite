@@ -32,7 +32,7 @@ function AddBusinessForm({ onAddBusiness, onCancel, industryOptions, memberList 
         'Logo URL': '' , // Remains for manual URL input
         'Physical Address' : '',
         'Email Address' : '',
-        'Viber Number' : '',
+        'Viber and Ph Number' : '',
         'Website Link' : '',
         'Facebook Link' : '',
         'Tiktok Link' : '',
@@ -156,7 +156,7 @@ function AddBusinessForm({ onAddBusiness, onCancel, industryOptions, memberList 
         // Logo URL field is handled separately for grouping/styling
         { label: 'Physical Address', name: 'Physical Address', required: false },
         { label: 'Email Address', name: 'Email Address', required: false, type: 'email' },
-        { label: 'Viber Number', name: 'Viber Number', required: false },
+        { label: 'Viber and Ph Number', name: 'Viber and Ph Number', required: false },
         { 
             label: 'Website Link', 
             name: 'Website Link', 

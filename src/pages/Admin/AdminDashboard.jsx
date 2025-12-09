@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo,useRef } from 'react';
 import QRCode from 'react-qr-code'; 
 import { auth, db } from '../../firebase';
@@ -82,53 +83,6 @@ const ConfirmModal = ({ itemName, itemType, onConfirm, onCancel }) => {
     );
 };
 
-// ⭐️ DESIGN CHANGE ⭐️ Updated QRCodeDisplay to a light theme
-// const QRCodeDisplay = ({ phoneNum, pin, ownerName, onClose }) => {
-    
-//     // The data to be encoded (Phone Number-Pin)
-//     const rawData = `${phoneNum}-${pin}`;
-    
-//     const baseUrl = "https://tbtwebsite-ten.vercel.app/scan?data="; 
-//     const dataString = `${baseUrl}${rawData}`;
-
-//     return (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
-//             <div 
-//                 className="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center border border-gray-200" 
-//                 onClick={e => e.stopPropagation()} 
-//             >
-//                 <h3 className="text-xl font-bold text-gray-800 mb-2">Member QR Code</h3>
-                
-//                 {/* 1. Owner Name */}
-//                 <p className="text-xl font-semibold text-blue-600 mb-4">{ownerName}</p>
-                
-//                 {/* 2. QR Code Photo */}
-//                 <div className="bg-white p-4 rounded-lg flex items-center justify-center h-64 w-64 mx-auto border border-gray-300">
-//                      <QRCode 
-//                         value={dataString} 
-//                         size={256} 
-//                         style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-//                      /> 
-//                 </div>
-                
-//                 {/* 3. Display Phone Number and PIN (Clean Display) */}
-//                 <div className="mt-4 space-y-2 p-3 bg-gray-100 rounded-lg border border-gray-200">
-//                     <div className="flex justify-between items-center">
-//                         <p className="text-sm font-medium text-gray-600">Phone Number:</p>
-//                         <p className="text-lg font-bold text-gray-800">{phoneNum}</p>
-//                     </div>
-                    
-//                     <div className="flex justify-between items-center pt-2 border-t border-gray-300">
-//                         <p className="text-sm font-medium text-gray-600">PIN:</p>
-//                         <p className="text-lg font-bold text-green-600">{pin}</p>
-//                     </div>
-//                 </div>
-                
-//                 <button onClick={onClose} className="mt-6 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Close</button>
-//             </div>
-//         </div>
-//     );
-// };
 const QRCodeDisplay = ({ phoneNum, pin, ownerName, memberID, onClose }) => {
     const qrRef = useRef(null); // Reference for the QR SVG
     
@@ -347,144 +301,6 @@ const LogoDisplay = ({ logoUrl, businessName }) => {
     );
 };
 
-
-// ⭐️ DESIGN CHANGE ⭐️ Updated BusinessView to a light theme
-// const BusinessView = ({ business, onBack }) => {
-    
-//     // ⭐️ INSERTION POINT 1: New state for logo loading error ⭐️
-//     const [logoLoadError, setLogoLoadError] = useState(false);
-    
-//     const logoUrl = business['Logo URL'];
-//     const isLogoUrlValid = logoUrl && (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'));
-    
-//     // Reset error when business or logoUrl changes
-//     useEffect(() => {
-//         setLogoLoadError(false);
-//     }, [logoUrl]);
-
-//     const displayKeys = [
-//         'Business Name', 'Owner Name', 'Industry Type', 'Status', 'Logo URL', 
-//         'Physical Address', 'Email Address', 'Phone Number', 'Viber Number', 
-//         'Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link', 
-//         'Created Date'
-//     ];
-    
-//     const linkFields = ['Website Link', 'Facebook Link', 'Tiktok Link', 'Google Map Link'];
-
-//     const getDisplayValue = (key, value) => {
-//         if (!value) { return 'N/A'; }
-        
-//         // This logic is for truncating the Logo URL text
-//         if (key === 'Logo URL' && isLogoUrlValid) {
-//             const maxLength = 50; 
-//             if (value.length > maxLength) {
-//                 const start = value.substring(0, 25);
-//                 const end = value.substring(value.length - 20);
-//                 return `${start}...${end}`;
-//             }
-//         }
-        
-//         if (key === 'Created Date') {
-//             const date = new Date(value);
-//             if (!isNaN(date)) {
-//                 return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-//             }
-//             return value; 
-//         }
-//         return value;
-//     };
-
-//     // ⭐️ NEW HELPER FUNCTION FOR RENDERING ALL FIELDS, INCLUDING LINKS ⭐️
-//     const renderBusinessField = (key, value) => {
-//         const isLinkField = linkFields.includes(key);
-//         const displayValue = getDisplayValue(key, value);
-        
-//         return (
-//             <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-//                 <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">
-//                     {key}
-//                     {/* ⭐️ HIGHLIGHTED CHANGE: Instruction for Admin ⭐️ */}
-//                     {isLinkField && value && value.trim() !== 'N/A' && (
-//                          <span className="ml-2 text-xs text-blue-600 font-normal italic bg-blue-100 px-2 py-0.5 rounded-full">
-//                             (Auto-prefixed: https://)
-//                          </span>
-//                     )}
-//                 </label>
-                
-//                 {isLinkField && value && value.trim() !== 'N/A' ? (
-//                     // Display as a clickable link, showing the URL without the prefix
-//                     <a 
-//                         href={value} // Full URL for clicking
-//                         target="_blank" 
-//                         rel="noopener noreferrer" 
-//                         className="text-blue-600 font-semibold hover:text-blue-800 hover:underline break-all"
-//                     >
-//                         {/* Clean display text (e.g., www.facebook.com/page) */}
-//                         {value.replace(/^https?:\/\//, '')} 
-//                     </a>
-//                 ) : (
-//                     // Render standard or N/A value
-//                     <p className="text-gray-700 font-semibold">{displayValue}</p>
-//                 )}
-//             </div>
-//         );
-//     };
-//     // ⭐️ END NEW LINK RENDERING HELPER ⭐️
-
-
-//     return (
-//         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-//             <h3 className="text-2xl font-bold text-gray-800 mb-6">Business Details (View Only)</h3>
-            
-//             {/* ⭐️ INSERTION POINT 2: Updated Logo Preview Section (Retained from previous changes) ⭐️ */}
-//             <div className="mb-6">
-//                 <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wider">Logo Preview</label>
-                
-//                 {/* 1. Check if the URL is valid (http/https) */}
-//                 {isLogoUrlValid ? (
-//                     <>
-//                         {/* 2. Check if there was a loading error */}
-//                         {logoLoadError ? (
-//                             <p className="text-sm text-red-500 mt-2 p-3 bg-red-50 rounded-lg border border-red-200">
-//                                 Error: Could not load image from saved URL. The link might be broken or not publicly accessible.
-//                             </p>
-//                         ) : (
-//                             // 3. Attempt to load the image
-//                             <img 
-//                                 key={logoUrl} // Use key to force re-render if URL changes
-//                                 src={logoUrl} 
-//                                 alt={`Logo for ${business['Business Name']}`} 
-//                                 className="w-24 h-24 object-contain rounded-lg border border-gray-300 p-1" 
-//                                 onError={() => { 
-//                                     setLogoLoadError(true); // If load fails, set error state
-//                                 }}
-//                             />
-//                         )}
-//                     </>
-//                 ) : (
-//                     // 4. Show fallback for invalid or empty URL
-//                     <p className="text-sm text-gray-500 p-3 bg-gray-100 rounded-lg border border-gray-200">
-//                         {logoUrl && logoUrl.trim().length > 0
-//                             ? `Saved Logo URL is invalid: ${logoUrl}` 
-//                             : 'No logo URL saved for this business.'}
-//                     </p>
-//                 )}
-//             </div>
-//             {/* ⭐️ END Updated Logo Preview Section ⭐️ */}
-            
-//             <div className="space-y-4">
-//                 {displayKeys.map(key => (
-//                     // ⭐️ MODIFIED: Use the new renderBusinessField helper for all fields ⭐️
-//                     renderBusinessField(key, business[key])
-//                 ))}
-//             </div>
-            
-//             <div className="pt-6 border-t border-gray-200 mt-6">
-//                 <button type="button" onClick={onBack} className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition cursor-pointer">← Back to Dashboard</button>
-//             </div>
-//         </div>
-//     );
-// };
 
 const BusinessView = ({ business, onBack, businessId, onUpdateBusinessStatus }) => {
     
@@ -784,136 +600,6 @@ const BusinessDetailView = ({ business, onBack, onUpdateData, setSuccessMessage,
     );
 };
 
-
-// ⭐️ DESIGN CHANGE ⭐️ Updated KanbanBoard to a light theme
-
-// const KanbanBoard = ({ businessData, onSelectBusiness, groupByField, title, onUpdateBusinessStatus }) => {
-    
-//     // ⭐️ FIX 1: The component now accepts onUpdateBusinessStatus prop ⭐️
-    
-//     const groups = businessData.reduce((acc, business) => {
-//         let key = business[groupByField] || `Unspecified ${groupByField}`;
-//         if (!acc[key]) {
-//             acc[key] = [];
-//         }
-//         acc[key].push(business);
-//         return acc;
-//     }, {});
-
-//     const uniqueGroups = Object.keys(groups).sort();
-
-//     const getColor = (groupKey) => {
-//         let hash = 0;
-//         for (let i = 0; i < groupKey.length; i++) { hash = groupKey.charCodeAt(i) + ((hash << 5) - hash); }
-//         let color = '#';
-//         for (let i = 0; i < 3; i++) {
-//             let value = (hash >> (i * 8)) & 0xFF;
-//             color += ('00' + value.toString(16)).substr(-2);
-//         }
-//         return color;
-//     };
-
-
-//     return (
-//         <div className="space-y-6">
-//             <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2>
-            
-//             <div className="flex space-x-4 overflow-x-auto pb-4">
-//                 {uniqueGroups.map(groupKey => (
-//                     <div key={groupKey} className="flex-shrink-0 w-80 bg-white p-4 rounded-xl shadow-lg border border-gray-200 border-t-4"
-//                         style={{ borderTopColor: getColor(groupKey) }}>
-//                         <h3 className="text-lg font-bold text-gray-800 mb-4 flex justify-between items-center">
-//                             {groupKey}
-//                             <span className="text-sm bg-gray-200 px-2 py-0.5 rounded-full text-gray-600">{groups[groupKey].length}</span>
-//                         </h3>
-                        
-//                         <div className="space-y-3">
-//                             {groups[groupKey].map(business => (
-//                                 <div 
-//                                     key={business.id} 
-//                                     onClick={() => onSelectBusiness && onSelectBusiness(business)} 
-//                                     className={`bg-gray-50 p-4 rounded-lg shadow-sm transition duration-150 border border-gray-200 ${onSelectBusiness ? 'cursor-pointer hover:bg-gray-100' : ''}`}
-//                                 >
-//                                     <div className="flex items-start space-x-3">
-//                                         {business['Logo URL'] && business['Logo URL'].trim().length > 0 && (
-//                                             <img 
-//                                                 src={business['Logo URL']} 
-//                                                 alt={`${business['Business Name']} Logo`} 
-//                                                 className="w-10 h-10 object-cover rounded-full flex-shrink-0 border border-gray-300"
-//                                                 onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }} 
-//                                             />
-//                                         )}
-                                        
-//                                         <div className="flex-1 min-w-0">
-//                                             <p className="font-semibold text-gray-800 truncate">{business['Business Name']}</p>
-                                            
-//                                             {business['Owner Name'] && (
-//                                                 <p className="text-xs text-gray-500 mt-0.5 truncate">
-//                                                     Owner: {business['Owner Name']}
-//                                                 </p>
-//                                             )}
-                                            
-//                                             {/* ⭐️ FIX 2: Replaced simple status text with detailed Status + Buttons block ⭐️ */}
-//                                             <div className="flex flex-col space-y-2 pt-2 mt-2 border-t border-gray-200">
-//                                                 {/* Current Status Display */}
-//                                                 <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full w-fit ${
-//                                                     business.Status === 'Active' ? 'bg-green-100 text-green-800' :
-//                                                     business.Status === 'Pending Review' ? 'bg-red-100 text-red-800' : 
-//                                                     business.Status === 'Rejected' ? 'bg-red-100 text-red-800' :
-//                                                     'bg-gray-100 text-gray-800'
-//                                                 }`}>
-//                                                     {business.Status}
-//                                                 </span>
-                                                
-//                                                 {/* Status Change Buttons */}
-//                                                 <div className="flex flex-wrap gap-1">
-                                                    
-//                                                     {/* Button to Set Active (Approve) */}
-//                                                     {(business.Status === 'Pending Review' || business.Status === 'Rejected') && (
-//                                                         <button
-//                                                             onClick={(e) => { e.stopPropagation(); onUpdateBusinessStatus(business.id, 'Active'); }}
-//                                                             className="text-xs px-2 py-1 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition"
-//                                                             title="Approve and set status to Active"
-//                                                         >
-//                                                             ✅ Active
-//                                                         </button>
-//                                                     )}
-                                                    
-//                                                     {/* Button to Set Pending Review (Revert) */}
-//                                                     {business.Status === 'Active' && (
-//                                                         <button
-//                                                             onClick={(e) => { e.stopPropagation(); onUpdateBusinessStatus(business.id, 'Pending Review'); }}
-//                                                             className="text-xs px-2 py-1 bg-yellow-500 text-white rounded-md font-medium hover:bg-yellow-600 transition"
-//                                                             title="Revert status to Pending Review"
-//                                                         >
-//                                                             🔄 Pending
-//                                                         </button>
-//                                                     )}
-                                                    
-//                                                     {/* Button to Set Rejected */}
-//                                                     {business.Status !== 'Rejected' && (
-//                                                         <button
-//                                                             onClick={(e) => { e.stopPropagation(); onUpdateBusinessStatus(business.id, 'Rejected'); }}
-//                                                             className="text-xs px-2 py-1 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition"
-//                                                             title="Reject the application"
-//                                                         >
-//                                                             ❌ Reject
-//                                                         </button>
-//                                                     )}
-//                                                 </div>
-//                                             </div>
-//                                             {/* ⭐️ END Status + Buttons block ⭐️ */}
-//                                         </div>
-//                                     </div>
-//                                 </div>
-//                             ))}
-//                         </div>
-//                     </div>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// };
 const KanbanBoard = ({ businessData, onSelectBusiness, groupByField, title, onUpdateBusinessStatus }) => {
     
     // ⭐️ FIX 1: onUpdateBusinessStatus is now in the props list ⭐️
@@ -1047,83 +733,7 @@ const KanbanBoard = ({ businessData, onSelectBusiness, groupByField, title, onUp
         </div>
     );
 };
-// ⭐️ DESIGN CHANGE ⭐️ Updated AddMemberAccountForm to a light theme
-// const AddMemberAccountForm = ({ onAddMember, onCancel }) => {
-//     const [formData, setFormData] = useState({
-//         'Owner Name': '',
-//         'Phone Number': '',
-//         'Pin': '',
-//     });
-//     const [isSaving, setIsSaving] = useState(false);
-    
-//     const handleChange = (e) => {
-//         const { name, value } = e.target;
-//         let finalValue = value;
-        
-//         if (name === 'Pin') {
-//             finalValue = value.replace(/[^0-9]/g, '').substring(0, 6);
-//         }
 
-//         setFormData(prev => ({ ...prev, [name]: finalValue }));
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-        
-//         if (!formData['Owner Name'] || !formData['Phone Number'] || formData.Pin.length !== 6) {
-//             alert("Please fill in Owner Name, Phone Number, and ensure PIN is exactly 6 digits.");
-//             return;
-//         }
-
-//         setIsSaving(true);
-//         await onAddMember(formData);
-//         setIsSaving(false);
-//     };
-
-//     return (
-//         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-lg mx-auto">
-//             <h3 className="text-2xl font-bold text-gray-800 mb-6">Register New Member Account</h3>
-//             <form onSubmit={handleSubmit} className="space-y-6">
-                
-//                 {/* Owner Name */}
-//                 <div>
-//                     <label htmlFor="ownerName" className="block text-sm font-medium text-gray-700 mb-1">Owner Name <span className="text-red-600">*</span></label>
-//                     <input type="text" id="ownerName" name="Owner Name" required value={formData['Owner Name']} onChange={handleChange}
-//                         className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:ring-blue-500 focus:border-blue-500"/>
-//                 </div>
-                
-//                 {/* Phone Number */}
-//                 <div>
-//                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number <span className="text-red-600">*</span></label>
-//                     <input type="tel" id="phone" name="Phone Number" required value={formData['Phone Number']} onChange={handleChange}
-//                         className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:ring-blue-500 focus:border-blue-500"/>
-//                 </div>
-                
-//                 {/* PIN (6 Digits) */}
-//                 <div>
-//                     <label htmlFor="pin" className="block text-sm font-medium text-gray-700 mb-1">6-Digit PIN <span className="text-red-600">*</span></label>
-//                     <input type="text" id="pin" name="Pin" required value={formData.Pin} onChange={handleChange}
-//                         maxLength={6} 
-//                         placeholder="e.g. 123456"
-//                         className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 text-center font-mono text-xl focus:ring-blue-500 focus:border-blue-500"/>
-//                     <p className="mt-1 text-xs text-gray-500">Must be exactly 6 numeric digits.</p>
-//                 </div>
-
-//                 {/* Action Buttons */}
-//                 <div className="flex justify-between pt-4 border-t border-gray-200">
-//                     <button type="button" onClick={onCancel} className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition">← Cancel</button>
-//                     <button 
-//                         type="submit" 
-//                         disabled={isSaving || formData.Pin.length !== 6 || !formData['Owner Name'] || !formData['Phone Number']}
-//                         className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-md disabled:bg-gray-500 cursor-pointer"
-//                     >
-//                         {isSaving ? 'Adding...' : 'Add Account'}
-//                     </button>
-//                 </div>
-//             </form>
-//         </div>
-//     );
-// };
 const AddMemberAccountForm = ({ onAddMember, onCancel }) => {
     const [formData, setFormData] = useState({
         'Owner Name': '',
@@ -1696,6 +1306,32 @@ function AdminDashboard({ setCurrentView, views, adminName,
         }
     };
 
+    const handleUpdateMemberPhone = useCallback(async (memberId, newPhone) => {
+        setIsLoading(true);
+        const trimmedPhone = newPhone.trim();
+        // Basic phone number validation
+        if (!trimmedPhone || trimmedPhone.length < 5) { 
+            setSuccessMessage("Phone number is too short or invalid.");
+            setIsLoading(false);
+            return false;
+        }
+    
+        try {
+            const memberRef = doc(db, 'members', memberId);
+            await updateDoc(memberRef, {
+                'Phone Number': trimmedPhone
+            });
+            setSuccessMessage(`Member phone number updated successfully!`);
+            return true; // Indicate success
+        } catch (err) {
+            console.error("Failed to update Phone Number:", err);
+            setSuccessMessage("Failed to update Phone Number. Please try again.");
+            return false; // Indicate failure
+        } finally {
+            setIsLoading(false);
+        }
+    }, [setSuccessMessage]);
+
     const handleUpdateMemberPin = useCallback(async (memberId, newPin) => {
         setIsLoading(true);
         try {
@@ -1979,6 +1615,7 @@ const handleUpdateBusinessStatus = useCallback(async (businessId, newStatus) => 
                 <BusinessOwnerListView 
                     businesses={memberPinListData}
                     industryOptions={industryOptions}
+                    onUpdateMemberPhone={handleUpdateMemberPhone}
                     onUpdateMemberPin={handleUpdateMemberPin}
                     setSuccessMessage={setSuccessMessage}
                     onDeleteMemberClick={handleDeleteMemberClick}

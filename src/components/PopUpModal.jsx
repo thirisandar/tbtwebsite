@@ -244,7 +244,7 @@ const PopupModal = ({ onClose, data }) => {
                         {renderLink('View Profile', tiktok)}
                     </p>
                     <p className="flex flex-col">
-                        <strong className="text-gray-500">Viber Contact:</strong> 
+                        <strong className="text-gray-500">Other Ph No and Viber No:</strong> 
                         <span className="text-gray-600 font-medium">{viber || 'N/A'}</span>
                     </p>
                     <p className="col-span-2 flex flex-col">

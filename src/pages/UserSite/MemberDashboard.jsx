@@ -29,16 +29,16 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
         // ⭐️ MODIFIED: Define ALL fields ⭐️
         const allDetails = [
-            { label: 'Industry', value: business['Industry Type'], icon: '🏢' },
-            { label: 'Address', value: business['Physical Address'], icon: '📍' },
-            { label: 'Email', value: business['Email Address'], icon: '📧' },
-            { label: 'Phone', value: business['Phone Number'], icon: '📞' },
-            { label: 'Viber', value: business['Viber Number'], icon: '💬' }, 
-            { label: 'Website', value: business['Website Link'], isLink: true, icon: '🔗' },
-            { label: 'Facebook', value: business['Facebook Link'], isLink: true, icon: '📘' },
-            { label: 'TikTok', value: business['Tiktok Link'], isLink: true, icon: '🎵' },
-            { label: 'Map', value: business['Google Map Link'], isLink: true, icon: '🗺️' }, 
-            { label: 'Created', value: business['Created Date'] ? new Date(business['Created Date']).toLocaleDateString() : '', icon: '📅' },
+            { label: 'Industry', value: business['Industry Type'], icon: '' },
+            { label: 'Address', value: business['Physical Address'], icon: '' },
+            { label: 'Email', value: business['Email Address'], icon: '' },
+            { label: 'Phone', value: business['Phone Number'], icon: '' },
+            { label: 'Ph number & Viber', value: business['Viber Number'], icon: '' }, 
+            { label: 'Website', value: business['Website Link'], isLink: true, icon: '' },
+            { label: 'Facebook', value: business['Facebook Link'], isLink: true, icon: '' },
+            { label: 'TikTok', value: business['Tiktok Link'], isLink: true, icon: '' },
+            { label: 'Map', value: business['Google Map Link'], isLink: true, icon: '' }, 
+            { label: 'Created', value: business['Created Date'] ? new Date(business['Created Date']).toLocaleDateString() : '', icon: '' },
         ]; 
         
         // ⭐️ KEY CHANGE: Filter the details to show only filled information ⭐️
@@ -211,7 +211,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
                 <div className="py-6 sm:py-8 mb-4 sm:mb-8 text-black bg-white shadow-sm border-b border-gray-200">
                     <div className="container mx-auto max-w-6xl px-4 sm:px-0">
                         <h1 className="text-xl sm:text-2xl font-semibold mb-1">
-                            Member Name - {welcomeName}
+                            Profile Name - {welcomeName}
                         </h1>   
                     </div>
                 </div>
