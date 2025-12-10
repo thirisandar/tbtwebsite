@@ -184,7 +184,7 @@ const PopupModal = ({ onClose, data }) => {
                 {/* Business Name and Logo */}
                 <div className="flex items-center space-x-3 w-full">
                     {logoUrl && <img src={logoUrl} alt={`${name} Logo`} className="w-10 h-10 object-contain rounded-lg border border-blue-300 p-1" />}
-                    <h2 className="text-2xl font-extrabold text-dark-800">Business Name - {name}</h2>
+                    <h2 className="text-2xl font-extrabold text-dark-800">{name}</h2>
                 </div>
                 
                 {/* Industry Badge */}
