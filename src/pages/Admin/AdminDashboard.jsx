@@ -557,9 +557,16 @@ const BusinessDetailView = ({ business, onBack, onUpdateData, setSuccessMessage,
                     <input type="text" id="Business Name" name="Business Name" required value={editData['Business Name'] || ''} onChange={handleChange}
                         className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"/>
                 </div>
-                
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number (Cannot be edited here)</label>
+                    <p className="w-full px-4 py-2 bg-gray-200 border border-gray-300 rounded-lg text-gray-800 text-sm">
+                        {business['Phone Number'] || 'N/A'}
+                    </p>
+                </div>
+
                 {/* 4. OTHER FIELDS (dynamic text inputs) */}
-                {editableKeys.filter(key => key !== 'Business Name').map(key => (
+                {editableKeys.filter(key => key !== 'Business Name' && key !== 'Phone Number').map(key => (
                     <div key={key}>
                         <label htmlFor={key} className="block text-sm font-medium text-gray-700 mb-1">{key}</label>
                         <input type="text" id={key} name={key} value={editData[key] || ''} onChange={handleChange}
@@ -835,7 +842,7 @@ const AddMemberAccountForm = ({ onAddMember, onCancel }) => {
 };
 
 // ⭐️ DESIGN CHANGE ⭐️ Updated BusinessOwnerListView to a light theme
-const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin, setSuccessMessage, onDeleteMemberClick }) => { 
+const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin, onUpdateMemberPhone, setSuccessMessage, onDeleteMemberClick }) => { 
     // State for filtering
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('Owner Name'); 
@@ -846,10 +853,44 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
     // ⭐️ NEW PIN EDIT STATE ⭐️
     const [pinBeingEdited, setPinBeingEdited] = useState(null); // stores member.id
     const [newPin, setNewPin] = useState('');
+
+    const [phoneBeingEdited, setPhoneBeingEdited] = useState(null); 
+    const [newPhone, setNewPhone] = useState('');
     
     // ⭐️ NEW QR CODE STATE: Holds all data for the modal ⭐️
     const [qrCodeData, setQrCodeData] = useState(null); // stores { phoneNum, pin, ownerName }
 
+    const handleEditPhoneClick = (business) => {
+        if (!onUpdateMemberPhone) return; 
+        setPhoneBeingEdited(business.id);
+        setNewPhone(business['Phone Number'] || '');
+    };
+    
+    const handleCancelEditPhone = () => {
+        setPhoneBeingEdited(null);
+        setNewPhone('');
+    };
+
+    const handleSavePhone = async (memberId) => {
+        // Simple validation for phone number
+        const cleanPhone = newPhone.replace(/[^0-9]/g, '');
+        if (!newPhone || cleanPhone.length < 5) {
+            setSuccessMessage("Phone Number must be at least 5 digits long.");
+            return;
+        }
+        if (onUpdateMemberPhone) {
+            await onUpdateMemberPhone(memberId, newPhone);
+        }
+        setPhoneBeingEdited(null);
+    };
+    const handleEditPinClick = (business) => {
+        if (!onUpdateMemberPin) return; 
+        
+        setVisiblePinId(null); 
+        
+        setPinBeingEdited(business.id);
+        setNewPin(business.Pin || '');
+    };
 
     // Memoized filtering logic
     const filteredBusinesses = useMemo(() => {
@@ -912,15 +953,6 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
         setQrCodeData(null);
     };
     
-    const handleEditPinClick = (business) => {
-        if (!onUpdateMemberPin) return; 
-        
-        setVisiblePinId(null); 
-        
-        setPinBeingEdited(business.id);
-        setNewPin(business.Pin || '');
-    };
-
     const handleCancelEditPin = () => {
         setPinBeingEdited(null);
         setNewPin('');
@@ -940,7 +972,171 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
         setNewPin('');
         setVisiblePinId(memberId);
     };
+        
 
+    // return (
+    //     <div className="space-y-6">
+    //         <h2 className="text-2xl font-bold text-gray-800">
+    //             Member Accounts & PIN Management
+    //         </h2>
+            
+    //         <p className="text-gray-600">
+    //             This list shows all registered user accounts, including those who have not yet submitted a business form ('Account Only'). Pin column is editable here.
+    //         </p>
+
+    //         {/* Filter Controls */}
+    //         <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 flex flex-col sm:flex-row gap-4">
+    //             {/* Search Input */}
+    //             <input
+    //                 type="text"
+    //                 placeholder={`Search by ${filterType}...`} 
+    //                 value={searchTerm}
+    //                 onChange={(e) => setSearchTerm(e.target.value)}
+    //                 className="w-full sm:flex-1 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
+    //             />
+
+    //             {/* Filter Type Selection */}
+    //             <select
+    //                 value={filterType}
+    //                 onChange={(e) => setFilterType(e.target.value)}
+    //                 className="w-full sm:w-auto px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:ring-blue-500 focus:border-blue-500"
+    //             >
+    //                 <option value="Owner Name">Owner Name</option>
+    //                 <option value="Phone Number">Phone Number</option>
+    //                 <option value="Status">Status</option>
+    //                 <option value="Industry Type">Industry Type</option>
+    //             </select>
+    //         </div>
+
+    //         {/* Business Table */}
+    //         <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
+    //             <table className="min-w-full divide-y divide-gray-200">
+    //                 <thead>
+    //                     <tr className="bg-gray-100 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+    //                         {columns.map(col => (
+    //                             <th key={col.key} scope="col" className="px-6 py-3">{col.name}</th>
+    //                         ))}
+    //                         <th scope="col" className="px-6 py-3">Actions</th> {/* Added Action column */}
+    //                     </tr>
+    //                 </thead>
+    //                 <tbody className="divide-y divide-gray-200">
+    //                     {filteredBusinesses.length > 0 ? (
+    //                         filteredBusinesses.map(business => (
+    //                             <tr key={business.id} className="hover:bg-gray-50 transition duration-100 text-sm text-gray-700"> 
+    //                                 {columns.map(col => (
+    //                                     <td key={col.key} className="px-6 py-4 whitespace-nowrap">
+                                            
+    //                                         {col.key === 'Pin' ? (
+    //                                             <div className="flex items-center space-x-3">
+    //                                                 {pinBeingEdited === business.id ? (
+    //                                                     <div className="flex items-center space-x-2">
+    //                                                         <input
+    //                                                             type="text"
+    //                                                             value={newPin}
+    //                                                             onChange={(e) => setNewPin(e.target.value.replace(/[^0-9]/g, '').substring(0, 6))}
+    //                                                             maxLength={6}
+    //                                                             className="w-24 px-2 py-1 bg-gray-200 border border-blue-600 rounded-md text-gray-800 text-center font-bold placeholder-gray-500"
+    //                                                         />
+    //                                                         <button onClick={() => handleSavePin(business.id)} disabled={newPin.length !== 6} className="text-green-600 hover:text-green-700 text-sm font-medium">Save</button>
+    //                                                         <button onClick={handleCancelEditPin} className="text-red-600 hover:text-red-700 text-sm font-medium">Cancel</button>
+    //                                                     </div>
+    //                                                 ) : (
+    //                                                     <>
+    //                                                         <span className="font-mono text-base">
+    //                                                             {visiblePinId === business.id ? (
+    //                                                                 <span className="text-green-600 font-bold">{business.Pin || 'N/A'}</span>
+    //                                                             ) : (
+    //                                                                 <span className="text-gray-500">{business.Pin ? '••••••' : 'N/A'}</span>
+    //                                                             )}
+    //                                                         </span>
+
+    //                                                         {business.Pin && (
+    //                                                             <button 
+    //                                                                 onClick={() => togglePinVisibility(business.id)} 
+    //                                                                 className="text-gray-400 hover:text-blue-600 ml-2"
+    //                                                                 aria-label={visiblePinId === business.id ? 'Hide PIN' : 'Show PIN'}
+    //                                                             >
+    //                                                                 <span className="text-lg">{visiblePinId === business.id ? '👁️' : '🔒'}</span> 
+    //                                                             </button>
+    //                                                         )}
+                                                            
+    //                                                         {onUpdateMemberPin && (
+    //                                                             <button 
+    //                                                                 onClick={() => handleEditPinClick(business)} 
+    //                                                                 className="text-blue-600 hover:text-blue-700 ml-2 text-xs font-medium"
+    //                                                             >
+    //                                                                 (Edit)
+    //                                                             </button>
+    //                                                         )}
+                                                            
+    //                                                         <button
+    //                                                             onClick={() => handleGenerateQR(business)}
+    //                                                             disabled={!business.Pin || !business['Phone Number']}
+    //                                                             className={`px-2 py-1 rounded-lg transition text-xs font-medium w-24 ml-2
+    //                                                                 ${business.Pin && business['Phone Number'] 
+    //                                                                     ? 'bg-green-600 text-white hover:bg-green-700' 
+    //                                                                     : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+    //                                                                 }`}
+    //                                                         >
+    //                                                             Generate QR
+    //                                                         </button>
+    //                                                     </>
+    //                                                 )}
+    //                                             </div>
+    //                                         ) : (
+    //                                             col.key === 'Business Name' && business.isMultipleBusiness ? (
+    //                                                 <span className="font-medium text-blue-600">
+    //                                                     {business['Business Name']}
+    //                                                 </span>
+    //                                             ) : col.key === 'Status' ? (
+    //                                                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+    //                                                     business.Status === 'Active' ? 'bg-green-100 text-green-800' :
+    //                                                     business.Status === 'Pending Review' ? 'bg-yellow-100 text-red-800' :
+    //                                                     business.Status === 'Rejected' ? 'bg-red-100 text-yellow-800' :
+    //                                                     'bg-gray-100 text-gray-800'
+    //                                                 }`}>
+    //                                                     {business.Status}
+    //                                                 </span>
+    //                                             ) : (
+    //                                                 displayValue(col.key, business[col.key])
+    //                                             )
+    //                                         )}
+    //                                     </td>
+    //                                 ))}
+    //                                 {/* ⭐️ NEW: Delete Member Button Column ⭐️ */}
+    //                                 <td className="px-6 py-4 whitespace-nowrap">
+    //                                     <button 
+    //                                         onClick={() => onDeleteMemberClick(business)} 
+    //                                         className="px-3 py-1.5 text-xs bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition shadow-md whitespace-nowrap"
+    //                                     >
+    //                                         Delete Member
+    //                                     </button>
+    //                                 </td>
+    //                             </tr>
+    //                         ))
+    //                     ) : (
+    //                         <tr>
+    //                             <td colSpan={columns.length + 1} className="px-6 py-10 text-center text-gray-500">
+    //                                 No records found matching current filters.
+    //                             </td>
+    //                         </tr>
+    //                     )}
+    //                 </tbody>
+    //             </table>
+    //         </div>
+
+    //         {/* ⭐️ NEW: QR Code Modal ⭐️ */}
+    //         {qrCodeData && (
+    //             <QRCodeDisplay 
+    //                 phoneNum={qrCodeData.phoneNum} 
+    //                 pin={qrCodeData.pin} 
+    //                 ownerName={qrCodeData.ownerName} 
+    //                 memberID={qrCodeData.memberID}
+    //                 onClose={handleCloseQR} 
+    //             />
+    //         )}
+    //     </div>
+    // );
 
     return (
         <div className="space-y-6">
@@ -952,9 +1148,7 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
                 This list shows all registered user accounts, including those who have not yet submitted a business form ('Account Only'). Pin column is editable here.
             </p>
 
-            {/* Filter Controls */}
             <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200 flex flex-col sm:flex-row gap-4">
-                {/* Search Input */}
                 <input
                     type="text"
                     placeholder={`Search by ${filterType}...`} 
@@ -963,7 +1157,6 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
                     className="w-full sm:flex-1 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
                 />
 
-                {/* Filter Type Selection */}
                 <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}
@@ -976,7 +1169,6 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
                 </select>
             </div>
 
-            {/* Business Table */}
             <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead>
@@ -984,7 +1176,7 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
                             {columns.map(col => (
                                 <th key={col.key} scope="col" className="px-6 py-3">{col.name}</th>
                             ))}
-                            <th scope="col" className="px-6 py-3">Actions</th> {/* Added Action column */}
+                            <th scope="col" className="px-6 py-3">Actions</th> 
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -994,7 +1186,48 @@ const BusinessOwnerListView = ({ businesses, industryOptions, onUpdateMemberPin,
                                     {columns.map(col => (
                                         <td key={col.key} className="px-6 py-4 whitespace-nowrap">
                                             
-                                            {col.key === 'Pin' ? (
+                                            {col.key === 'Phone Number' ? (
+                                                <div className="flex items-center space-x-3">
+                                                    {phoneBeingEdited === business.id ? (
+                                                        <div className="flex items-center space-x-2">
+                                                            <input
+                                                                type="text"
+                                                                value={newPhone}
+                                                                onChange={(e) => setNewPhone(e.target.value)}
+                                                                maxLength={20}
+                                                                className="w-32 px-2 py-1 bg-gray-200 border border-blue-600 rounded-md text-gray-800 text-center font-bold placeholder-gray-500"
+                                                            />
+                                                            <button 
+                                                                onClick={() => handleSavePhone(business.id)} 
+                                                                disabled={!newPhone || newPhone.replace(/[^0-9]/g, '').length < 5} 
+                                                                className="text-green-600 hover:text-green-700 text-sm font-medium disabled:text-gray-400"
+                                                            >
+                                                                Save
+                                                            </button>
+                                                            <button 
+                                                                onClick={handleCancelEditPhone} 
+                                                                className="text-red-600 hover:text-red-700 text-sm font-medium"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className="font-semibold text-gray-700">{business['Phone Number'] || 'N/A'}</span>
+                                                            
+                                                            {business['Phone Number'] !== 'N/A' && onUpdateMemberPhone && ( 
+                                                                <button
+                                                                    onClick={() => handleEditPhoneClick(business)} 
+                                                                    className="text-blue-600 hover:text-blue-700 ml-2 text-xs font-medium"
+                                                                >
+                                                                    (Edit)
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : col.key === 'Pin' ? (
+                                            
                                                 <div className="flex items-center space-x-3">
                                                     {pinBeingEdited === business.id ? (
                                                         <div className="flex items-center space-x-2">
@@ -1615,8 +1848,8 @@ const handleUpdateBusinessStatus = useCallback(async (businessId, newStatus) => 
                 <BusinessOwnerListView 
                     businesses={memberPinListData}
                     industryOptions={industryOptions}
-                    onUpdateMemberPhone={handleUpdateMemberPhone}
                     onUpdateMemberPin={handleUpdateMemberPin}
+                    onUpdateMemberPhone={handleUpdateMemberPhone}
                     setSuccessMessage={setSuccessMessage}
                     onDeleteMemberClick={handleDeleteMemberClick}
                 />
