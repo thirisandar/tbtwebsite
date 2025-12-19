@@ -28,7 +28,7 @@ const CardBox = ({ business, onModalOpen }) => (
             onClick={() => onModalOpen(business)} 
             className="w-full mt-4 py-2 bg-blue-300 text-gray-600 font-medium rounded-lg hover:bg-blue-600 hover:text-white transition duration-150 shadow-md cursor-pointer"
         >
-            View Details
+            အသေးစိတ်ကြည့်ရန်
         </button>
     </div>
 );
@@ -76,13 +76,13 @@ function ActiveBusinessDirectory() {
         <>
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">
-                    TBT Member ၀င်များ၏ စီးပွားရေးများ
+                    TBT အဖွဲ့၀င်များ၏ စီးပွားရေးများ
                 </h2>
-                <span className="text-blue-600">{businesses.length} Active Business</span> 
+                <span className="text-blue-600">လက်ရှိစာရင်းသွင်းထားသော စီးပွားရေးလုပ်ငန်း {businesses.length} ခု</span> 
                 <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch mt-3">
                     <input 
                         type="text" 
-                        placeholder="Search by name, type, or location..." 
+                        placeholder="စီးပွားရေးလုပ်ငန်းနာမည်၊အမျိုးအစား၊နေရာများဖြင့်ရှာပါ။" 
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
                         className="w-full flex-grow p-3 border border-gray-300 rounded-lg focus:border-gray-500 focus:outline-none" 
@@ -93,7 +93,7 @@ function ActiveBusinessDirectory() {
                             onChange={(e) => setActiveFilter(e.target.value)} 
                             className="appearance-none w-full p-3 border border-gray-300 rounded-lg bg-white focus:border-blue-300 focus:outline-none"
                         >
-                            {DYNAMIC_FILTER_CATEGORIES.map(type => <option key={type} value={type}>{type === 'All' ? 'Filter by Type' : type}</option>)}
+                            {DYNAMIC_FILTER_CATEGORIES.map(type => <option key={type} value={type}>{type === 'All' ? 'အမျိုးအစားဖြင့်ရှာပါ။' : type}</option>)}
                         </select>
                     </div>
                 </div>
